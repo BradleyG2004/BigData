@@ -12,16 +12,46 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ================================
-# 🔧 Configuration
+# 🔧 Variables d'environnement
 # ================================
 
-# URL de l'API Polymarket
+# URL de l'API Polymarket (définie dans ton fichier .env à la racine du projet)
 POLYMARKET_API_URL = os.getenv('POLYMARKET_API_URL')
 
-# Configuration Kafka
+# Configuration Kafka (producer)
+# Exemple de valeurs dans .env :
+#   KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+#   KAFKA_TOPIC=polymarket-events
 KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'polymarket-events')
 
+# Mode de sortie des données :
+#   - 'kafka' : envoie uniquement dans Kafka
+#   - 'mongo' : insère uniquement dans MongoDB
+#   - 'both'  : envoie dans Kafka ET dans MongoDB
+OUTPUT_MODE = os.getenv('OUTPUT_MODE', 'kafka').lower()
+
+def connect_mongodb():
+    """Connect to MongoDB Atlas"""
+    try:
+        mongo_uri = os.getenv('MONGO_URI')
+        
+        if not mongo_uri:
+            print("❌ Error: MONGO_URI not found in .env file")
+            return None
+        
+        print("🔄 Connecting to MongoDB Atlas...")
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        client.admin.command('ping')
+        print("✅ Successfully connected to MongoDB Atlas!")
+        
+        return client
+        
+    except (ConnectionFailure, ServerSelectionTimeoutError) as e:
+        print(f"❌ Connection error: {e}")
+        return None
+
+def create_kafka_producer():
     """
     Crée un producteur Kafka.
     
