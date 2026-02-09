@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS kafka_metrics (
     timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
     topic VARCHAR(100) NOT NULL,
     partition INTEGER,
-    offset BIGINT,
+    "offset" BIGINT,
     messages_count INTEGER,
     lag BIGINT,
     consumer_group VARCHAR(100)

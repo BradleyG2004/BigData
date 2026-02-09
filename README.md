@@ -1,215 +1,393 @@
-# 📊 Polymarket Data Pipeline - Orchestration Airflow
+# 🎯 Guide de Démarrage Complet - Pipeline Polymarket
 
-> Pipeline de données orchestré par **Apache Airflow** pour collecter, traiter et monitorer les événements Polymarket.
-
-## 🏗️ Architecture avec Orchestration
+## Architecture Complète
 
 ```
-                    ┌─────────────┐
-                    │   Airflow   │ (Orchestrateur)
-                    │  Scheduler  │
-                    └──────┬──────┘
-                           │
-            ┌──────────┼────────────────┐
-            │              │              │   │
-            │              │              │   │
-            │              │              │   │
-            │              │              │   │
-            │              │              │   │
-            ▼              ▼              ▼   ▼
-      ┌─────────┐    ┌─────────┐   ┌─────────┐ ┌─────────┐
-      │  Task 1 │    │  Task 2 │   │  Task 3 │ │  Task 4 │
-      │ API→Kafka│───▶│Kafka→Mongo──▶│Nettoyage─▶│  Spark  │
-      └─────────┘    └─────────┘   └─────────┘ └─────────┘
-            │              │              │        │
-            ▼              ▼              ▼        ▼
-      [Kafka Topic]  [MongoDB Atlas]  [cleaned]  [Analytics]
-                                       collection
-                           ▲
-                           │
-                    [Monitoring MongoDB]
+┌─────────────────────────────────────────────────────────────────────┐
+│                         POLYMARKET PIPELINE                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+📡 API Polymarket
+    ↓
+🔥 Kafka (Topic: polymarket-events)
+    ↓
+🗄️ MongoDB (Collection: polymarket) [RAW DATA]
+    ↓
+🧹 Cleaning Process
+    ↓
+🗄️ MongoDB (Collection: cleaned) [CLEANED DATA]
+    ↓
+🗄️ PostgreSQL (Table: polymarket_cleaned) [STRUCTURED DATA]
+    ↓
+📊 Grafana Dashboards [VISUALIZATION & COMPARISON]
+    ↑
+🔥 Spark Processing (Analysis)
 ```
 
 ## 🚀 Démarrage Rapide
 
-```bash
-# 1. Configuration
-cp .env.example .env
-# Éditer .env : remplir MONGO_URI
+### 1. Configuration Initiale
 
-# 2. Créer dossiers Airflow
-mkdir -p dags logs plugins config
+```powershell
+# Cloner ou naviguer vers le dossier du projet
+cd "C:\Users\Bradlley GANGNOU\OneDrive\Desktop\ArchBigDatA"
 
-# 3. Démarrer
+# Créer le fichier .env avec vos credentials MongoDB
+# Éditer .env et remplacer MONGO_URI par votre vraie URI MongoDB Atlas
+```
+
+### 2. Démarrer tous les services
+
+```powershell
+# Démarrer l'infrastructure complète
 docker-compose up -d
 
-# 4. Accéder à Airflow
-# http://localhost:8081
-# Username: admin / Password: admin
-
-# 5. Activer le DAG
-# Cliquer sur le toggle dans l'UI Airflow
+# Vérifier que tous les containers sont démarrés
+docker-compose ps
 ```
 
-## 📊 Workflow du DAG
+### 3. Vérifier les Services
 
-```
-1. check_kafka_ready (vérifie Kafka disponible)
-      ↓
-2. fetch_api_send_kafka (API → Kafka)
-      ↓
-3. consume_kafka_insert_mongo (Kafka → MongoDB)
-      ↓
-4. clean_polymarket_data (🧹 Nettoyage des données)
-      ↓  
-5. spark_processing (traitement analytics)
-```
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| 🌬️ Airflow | http://localhost:8081 | admin / admin |
+| 📊 Grafana | http://localhost:3000 | admin / admin |
+| 🔥 Spark Master | http://localhost:8082 | - |
+| 🗄️ PostgreSQL | localhost:5433 | polymarket / polymarket123 |
+| 🧩 Kafka | localhost:9092 | - |
 
-### Détail des Tâches
+### 4. Lancer le Pipeline
 
-#### Task 1 : API → Kafka
-- Récupère 100 événements depuis l'API Polymarket
-- Envoie chaque événement dans le topic Kafka `polymarket-events`
-- Log les métriques dans MongoDB monitoring
+#### Option A: Via Airflow (Recommandé)
 
-#### Task 2 : Kafka → MongoDB
-- Consomme les messages du topic Kafka
-- Insère les documents dans la collection `polymarket`
-- Timeout de 30s (mode batch, pas de boucle infinie)
+1. Ouvrir http://localhost:8081
+2. Se connecter (admin/admin)
+3. Activer le DAG `polymarket_data_pipeline`
+4. Cliquer sur "Trigger DAG" pour le lancer manuellement
 
-#### Task 3 : Nettoyage 🧹 (NOUVEAU)
-- Filtre les documents (image, icon, seriesSlug, resolutionSource doivent exister)
-- Supprime les champs inutiles (liquidity, archived, volume*, etc.)
-- Insère les documents nettoyés dans la collection `cleaned`
-- Log : nombre de documents source, filtrés, exclus, insérés
+Le pipeline s'exécutera automatiquement toutes les heures.
 
-#### Task 4 : Spark Processing
-- Traitement analytics (placeholder pour l'instant)
-- À implémenter selon vos besoins
+#### Option B: Scripts manuels
 
-### Schedule
+```powershell
+# 1. Récupérer les données de l'API et envoyer à Kafka
+python producer.py
 
-Par défaut : **@hourly** (toutes les heures)
+# 2. Consommer Kafka et insérer dans MongoDB
+python consumer.py
 
-Modifiable dans `dags/polymarket_pipeline_dag.py` :
-```python
-schedule_interval='@hourly'  # ou @daily, @weekly, cron syntax, etc.
+# 3. Nettoyer les données MongoDB
+python CleaningPolymarket.py
+
+# 4. Charger dans PostgreSQL
+python mongo_to_postgres.py
 ```
 
-## 🔍 Monitoring
+### 5. Visualiser avec Grafana
 
-### Airflow UI
-- **URL** : http://localhost:8081
-- **Graph View** : Visualisation du workflow
-- **Logs** : Logs détaillés de chaque task
-- **Stats** : Performance et historique
+1. Ouvrir http://localhost:3000
+2. Se connecter (admin/admin)
+3. Aller dans **Dashboards**
+4. Sélectionner:
+   - **Polymarket - Cleaned Data Analysis** (données PostgreSQL)
+   - **Polymarket - Cleaned vs Raw Data Comparison** (comparaison)
 
-### MongoDB Atlas - `polymarket_monitoring`
+## 📦 Structure du Projet
 
-Collections :
-- `pipeline_metrics` : Exécutions des pipelines
-- `batch_inserts` : Performance des insertions
-- `kafka_metrics` : Métriques Kafka
-- `error_logs` : Erreurs capturées
+```
+ArchBigDatA/
+├── 📄 Docker-compose.yaml           # Orchestration des services
+├── 📄 .env                           # Variables d'environnement
+├── 📄 requirements.txt               # Dépendances Python
+│
+├── 📁 dags/                          # DAGs Airflow
+│   └── polymarket_pipeline_dag.py   # Pipeline principal
+│
+├── 📁 grafana/                       # Configuration Grafana
+│   ├── provisioning/
+│   │   ├── datasources/
+│   │   │   └── datasources.yml      # PostgreSQL & MongoDB
+│   │   └── dashboards/
+│   │       └── dashboards.yml
+│   └── dashboards/
+│       ├── polymarket-cleaned-dashboard.json
+│       └── polymarket-comparison-dashboard.json
+│
+├── 📁 postgres-init/                 # Scripts SQL PostgreSQL
+│   ├── 01-init.sql                  # Tables de monitoring
+│   └── 02-polymarket-schema.sql     # Schéma Polymarket
+│
+├── 📁 spark-apps/                    # Applications Spark
+│   └── spark_consumer.py
+│
+├── 🐍 producer.py                    # Producteur Kafka
+├── 🐍 consumer.py                    # Consommateur Kafka
+├── 🐍 CleaningPolymarket.py         # Nettoyage des données
+├── 🐍 mongo_to_postgres.py          # Transfert MongoDB → PostgreSQL
+├── 🐍 monitoring_mongo.py           # Service de monitoring
+│
+└── 📚 Documentation/
+    ├── README.md
+    ├── POSTGRES_README.md
+    └── GRAFANA_README.md
+```
 
-### Spark UI
-- **URL** : http://localhost:8080
-- Jobs et workers
+## 🔄 Flux de Données Détaillé
 
-## 🛠️ Troubleshooting
+### Étape 1: Collecte (API → Kafka)
+- **Script**: `producer.py` ou DAG task `fetch_api_send_kafka`
+- **Source**: https://gamma-api.polymarket.com/events
+- **Destination**: Topic Kafka `polymarket-events`
+- **Fréquence**: Toutes les heures (via Airflow)
 
-### DAG n'apparaît pas
+### Étape 2: Ingestion (Kafka → MongoDB Raw)
+- **Script**: `consumer.py` ou DAG task `consume_kafka_insert_mongo`
+- **Source**: Topic Kafka `polymarket-events`
+- **Destination**: MongoDB `polymarket_db.polymarket`
+- **Type**: Données brutes, non filtrées
 
-```bash
+### Étape 3: Nettoyage (MongoDB Raw → MongoDB Cleaned)
+- **Script**: `CleaningPolymarket.py` ou DAG task `clean_polymarket_data`
+- **Source**: MongoDB `polymarket_db.polymarket`
+- **Destination**: MongoDB `polymarket_db.cleaned`
+- **Actions**:
+  - ✅ Filtrer: image, icon, seriesSlug, resolutionSource non vides
+  - ✅ Supprimer 25+ champs inutiles
+  - ✅ Conserver uniquement les données qualitatives
+
+### Étape 4: Structuration (MongoDB Cleaned → PostgreSQL)
+- **Script**: `mongo_to_postgres.py` ou DAG task `load_to_postgres`
+- **Source**: MongoDB `polymarket_db.cleaned`
+- **Destination**: PostgreSQL `polymarket_db.polymarket_cleaned`
+- **Avantages**:
+  - 🔍 Requêtes SQL performantes
+  - 📊 Jointures et agrégations avancées
+  - 🎯 Indexation optimisée
+
+### Étape 5: Visualisation (PostgreSQL → Grafana)
+- **Dashboards**: Comparaison cleaned vs raw
+- **Métriques**: Qualité, complétude, distribution
+- **Refresh**: 30s - 1m
+
+### Étape 6: Analyse (Spark Processing)
+- **Script**: `spark_consumer.py` ou DAG task `spark_processing`
+- **Analyses**: Machine Learning, prédictions, tendances
+
+## 🎛️ Commandes Utiles
+
+### Docker
+
+```powershell
+# Démarrer tous les services
+docker-compose up -d
+
+# Démarrer un service spécifique
+docker-compose up -d grafana
+
+# Arrêter tous les services
+docker-compose down
+
+# Arrêter et supprimer les volumes
+docker-compose down -v
+
+# Voir les logs d'un service
+docker-compose logs -f grafana
+
+# Redémarrer un service
+docker-compose restart airflow-webserver
+
+# Voir l'état des services
+docker-compose ps
+```
+
+### PostgreSQL
+
+```powershell
+# Se connecter à PostgreSQL
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db
+
+# Ou depuis Windows (si psql installé)
+psql -h localhost -p 5433 -U polymarket -d polymarket_db
+
+# Requêtes utiles
+SELECT COUNT(*) FROM polymarket_cleaned;
+SELECT * FROM polymarket_active_events LIMIT 10;
+SELECT * FROM polymarket_stats_by_category;
+```
+
+### MongoDB
+
+```powershell
+# Vérifier le nombre de documents
+# Via Python
+python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); client = MongoClient(os.getenv('MONGO_URI')); print('Raw:', client['polymarket_db']['polymarket'].count_documents({})); print('Cleaned:', client['polymarket_db']['cleaned'].count_documents({}))"
+```
+
+### Kafka
+
+```powershell
+# Lister les topics (depuis le container)
+docker exec broker kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+# Voir les messages d'un topic
+docker exec broker kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic polymarket-events --from-beginning --max-messages 10
+```
+
+## 📊 Monitoring
+
+### 1. Pipeline Airflow
+
+- **URL**: http://localhost:8081
+- **DAG**: `polymarket_data_pipeline`
+- **Monitoring**: Graph View, Task Duration, Logs
+
+### 2. Grafana Dashboards
+
+- **URL**: http://localhost:3000
+- **Dashboards**: Cleaned Analysis, Comparison
+- **Metrics**: Count, Quality, Distribution
+
+### 3. PostgreSQL Monitoring
+
+```sql
+-- Taille de la base
+SELECT pg_size_pretty(pg_database_size('polymarket_db'));
+
+-- Activité récente
+SELECT * FROM pipeline_runs ORDER BY start_time DESC LIMIT 10;
+
+-- Métriques Kafka
+SELECT * FROM kafka_metrics ORDER BY timestamp DESC LIMIT 10;
+
+-- Logs d'erreurs
+SELECT * FROM error_logs ORDER BY timestamp DESC LIMIT 10;
+```
+
+## 🐛 Dépannage
+
+### Problème: Airflow ne démarre pas
+
+```powershell
 # Vérifier les logs
-docker logs airflow-scheduler
+docker-compose logs airflow-init
+docker-compose logs airflow-webserver
 
-# Lister les DAGs
-docker exec airflow-scheduler airflow dags list
+# Réinitialiser Airflow
+docker-compose down
+docker volume rm archbigdata_postgres-db-volume
+docker-compose up -d
 ```
 
-### Erreur Kafka
+### Problème: Grafana ne trouve pas PostgreSQL
 
-```bash
-# Vérifier Kafka
-docker ps | grep broker
-docker logs broker
+```powershell
+# Vérifier que PostgreSQL est démarré
+docker-compose ps postgres-polymarket
 
 # Tester la connexion
-docker exec airflow-webserver python -c "
-from kafka import KafkaProducer
-p = KafkaProducer(bootstrap_servers='broker:9092')
-print('✅ Kafka OK')
-p.close()
-"
+docker exec grafana ping -c 3 postgres-polymarket
+
+# Vérifier les datasources
+docker exec grafana cat /etc/grafana/provisioning/datasources/datasources.yml
 ```
 
-### Erreur MongoDB
+### Problème: Données non transférées vers PostgreSQL
 
-Vérifier :
-1. `MONGO_URI` dans `.env`
-2. IP whitelisted dans MongoDB Atlas
-3. Credentials corrects
+```powershell
+# 1. Vérifier MongoDB cleaned
+python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); print(MongoClient(os.getenv('MONGO_URI'))['polymarket_db']['cleaned'].count_documents({}))"
 
-### Réinitialisation complète
+# 2. Exécuter manuellement le transfert
+python mongo_to_postgres.py
 
-```bash
-docker-compose down -v
-rm -rf logs/*
-docker-compose up -d
+# 3. Vérifier PostgreSQL
+docker exec postgres-polymarket psql -U polymarket -d polymarket_db -c "SELECT COUNT(*) FROM polymarket_cleaned;"
 ```
 
-## 📝 Variables Clés (.env)
+### Problème: Kafka ne reçoit pas de messages
+
+```powershell
+# Vérifier que Kafka est prêt
+docker-compose logs broker
+
+# Tester avec le producteur
+python producer.py
+
+# Vérifier les messages
+docker exec broker kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic polymarket-events --max-messages 5
+```
+
+## 🔐 Sécurité
+
+### Credentials par défaut (à changer en production)
 
 ```env
-# Requis
-POLYMARKET_API_URL=https://gamma-api.polymarket.com/events
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/
+# Airflow
+AIRFLOW_USER=admin
+AIRFLOW_PASSWORD=admin
 
-# Optionnel (valeurs par défaut OK)
-KAFKA_BOOTSTRAP_SERVERS=broker:9092
-KAFKA_TOPIC=polymarket-events
-DB2=polymarket_db
-MONITORING_DB=polymarket_monitoring
-BATCH_SIZE=100
+# Grafana
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=admin
+
+# PostgreSQL
+POSTGRES_USER=polymarket
+POSTGRES_PASSWORD=polymarket123
+
+# MongoDB
+MONGO_URI=mongodb+srv://votre_vrai_uri
 ```
 
-## 🎓 Pourquoi Airflow ?
+## 📈 Performance
 
-### Avantages
+### Optimisations recommandées
 
-✅ **Orchestration** : Enchaînement automatique des tâches  
-✅ **Scheduling** : Exécution programmée (hourly, daily, etc.)  
-✅ **Retry Logic** : Relance automatique en cas d'échec  
-✅ **Monitoring** : UI complète pour suivre tout  
-✅ **Alerting** : Notifications en cas de problème  
-✅ **Scalabilité** : Facile d'ajouter des tasks  
+1. **PostgreSQL**:
+   - Index créés automatiquement
+   - ANALYZE régulier
+   - VACUUM occasionnel
 
-### Cas d'usage
+2. **MongoDB**:
+   - Index sur les champs fréquents
+   - Cleaning régulier des anciennes données
 
-- ✅ Pipeline batch régulier (hourly, daily)
-- ✅ Dépendances entre tasks
-- ✅ Besoin de retry automatique
-- ✅ Équipe qui a besoin de visibilité
+3. **Kafka**:
+   - Partitions configurées (3 par défaut)
+   - Retention policy adaptée
 
-## 🔄 Évolution du Projet
+4. **Grafana**:
+   - Cache des queries
+   - Refresh interval optimal (30s-1m)
 
-### Version 1.0 (Sans orchestration)
-- Scripts Python indépendants
-- Consumer en boucle infinie
-- Lancement manuel
+## 🎓 Documentation Complète
 
-### Version 2.0 (Avec Airflow) ← Actuel
-- Orchestration Airflow
-- Consumer déclenché par task
-- Monitoring MongoDB intégré
-- Scheduling automatique
+- **[POSTGRES_README.md](POSTGRES_README.md)**: Guide PostgreSQL complet
+- **[GRAFANA_README.md](GRAFANA_README.md)**: Guide Grafana détaillé
+- **README.md**: Documentation générale du projet
 
-## 📚 Documentation
+## 🚀 Prochaines Améliorations
 
-- [README_FULL.md](README.md) - Documentation complète
-- [dags/polymarket_pipeline_dag.py](dags/polymarket_pipeline_dag.py) - Code du DAG
+- [ ] Alertes Grafana sur seuils de qualité
+- [ ] Dashboard temps réel Kafka metrics
+- [ ] API REST pour interrogation PostgreSQL
+- [ ] Tests automatisés du pipeline
+- [ ] CI/CD avec GitHub Actions
+- [ ] Backup automatisé PostgreSQL/MongoDB
+- [ ] Dashboard Spark metrics
+
+## 💡 Support
+
+**Problème?** Vérifier dans l'ordre:
+
+1. Logs: `docker-compose logs <service>`
+2. Status: `docker-compose ps`
+3. Health: `docker inspect <container> | grep -i health`
+4. Documentation: README files
+5. Variables: Vérifier `.env`
 
 ---
 
-**Quick Start** : `docker-compose up -d` → http://localhost:8081 → Activer le DAG 🚀
+**Version**: 1.0.0
+**Date**: 2026-02-09
+**Auteur**: Pipeline Polymarket Team
+
