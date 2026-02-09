@@ -237,6 +237,37 @@ services:
   # ================================
   # 📊 Grafana - Visualisation et comparaison des données
   # ================================
+  # Service de collecte des statistiques MongoDB pour Grafana
+  mongo-stats-collector:
+    image: python:3.11-slim
+    container_name: mongo-stats-collector
+    working_dir: /app
+    command: >
+      sh -c "
+        pip install --no-cache-dir pymongo psycopg2-binary python-dotenv &&
+        python collect_mongo_stats.py --continuous --interval 300
+      "
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB:-polymarket_db}
+      - POSTGRES_HOST=postgres-polymarket
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=polymarket_db
+      - POSTGRES_USER=polymarket
+      - POSTGRES_PASSWORD=polymarket123
+    volumes:
+      - ./collect_mongo_stats.py:/app/collect_mongo_stats.py:ro
+    depends_on:
+      postgres-polymarket:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'collect_mongo_stats.py' || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   grafana:
     image: grafana/grafana:10.2.3
     container_name: grafana
@@ -253,7 +284,10 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
-      - postgres-polymarket
+      postgres-polymarket:
+        condition: service_healthy
+      mongo-stats-collector:
+        condition: service_started
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
