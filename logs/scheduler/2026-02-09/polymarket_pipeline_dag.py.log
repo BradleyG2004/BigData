@@ -848,3 +848,31 @@ NameError: name 'clean_polymarket_data_task' is not defined
 [2026-02-09T12:09:36.278+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:09:36.277+0000] {dag.py:3036} INFO - Sync 1 DAGs
 [2026-02-09T12:09:36.298+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:09:36.298+0000] {dag.py:3823} INFO - Setting next_dagrun for polymarket_data_pipeline to 2026-02-09 12:00:00+00:00, run_after=2026-02-09 13:00:00+00:00
 [2026-02-09T12:09:36.321+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/polymarket_pipeline_dag.py took 0.093 seconds
+[2026-02-09T12:10:06.526+0000] {processor.py:161} INFO - Started process (PID=635) to work on /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:06.527+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/polymarket_pipeline_dag.py for tasks to queue
+[2026-02-09T12:10:06.528+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:06.528+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:06.551+0000] {processor.py:840} INFO - DAG(s) 'polymarket_data_pipeline' retrieved from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:06.580+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:06.579+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-02-09T12:10:06.600+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:06.600+0000] {dag.py:3823} INFO - Setting next_dagrun for polymarket_data_pipeline to 2026-02-09 12:00:00+00:00, run_after=2026-02-09 13:00:00+00:00
+[2026-02-09T12:10:06.628+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/polymarket_pipeline_dag.py took 0.105 seconds
+[2026-02-09T12:10:36.789+0000] {processor.py:161} INFO - Started process (PID=646) to work on /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:36.790+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/polymarket_pipeline_dag.py for tasks to queue
+[2026-02-09T12:10:36.791+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:36.791+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:36.821+0000] {processor.py:840} INFO - DAG(s) 'polymarket_data_pipeline' retrieved from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:10:36.857+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:36.857+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-02-09T12:10:36.882+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:10:36.882+0000] {dag.py:3823} INFO - Setting next_dagrun for polymarket_data_pipeline to 2026-02-09 12:00:00+00:00, run_after=2026-02-09 13:00:00+00:00
+[2026-02-09T12:10:36.909+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/polymarket_pipeline_dag.py took 0.123 seconds
+[2026-02-09T12:11:07.161+0000] {processor.py:161} INFO - Started process (PID=657) to work on /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:07.162+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/polymarket_pipeline_dag.py for tasks to queue
+[2026-02-09T12:11:07.164+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:07.163+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:07.196+0000] {processor.py:840} INFO - DAG(s) 'polymarket_data_pipeline' retrieved from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:07.236+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:07.236+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-02-09T12:11:07.269+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:07.268+0000] {dag.py:3823} INFO - Setting next_dagrun for polymarket_data_pipeline to 2026-02-09 12:00:00+00:00, run_after=2026-02-09 13:00:00+00:00
+[2026-02-09T12:11:07.294+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/polymarket_pipeline_dag.py took 0.137 seconds
+[2026-02-09T12:11:37.402+0000] {processor.py:161} INFO - Started process (PID=668) to work on /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:37.404+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/polymarket_pipeline_dag.py for tasks to queue
+[2026-02-09T12:11:37.406+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:37.405+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:37.434+0000] {processor.py:840} INFO - DAG(s) 'polymarket_data_pipeline' retrieved from /opt/airflow/dags/polymarket_pipeline_dag.py
+[2026-02-09T12:11:37.472+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:37.471+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-02-09T12:11:37.498+0000] {logging_mixin.py:188} INFO - [2026-02-09T12:11:37.498+0000] {dag.py:3823} INFO - Setting next_dagrun for polymarket_data_pipeline to 2026-02-09 12:00:00+00:00, run_after=2026-02-09 13:00:00+00:00
+[2026-02-09T12:11:37.523+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/polymarket_pipeline_dag.py took 0.124 seconds
