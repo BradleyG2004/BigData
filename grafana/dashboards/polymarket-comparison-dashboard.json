@@ -133,11 +133,11 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "-- Note: Cette requête montre l'estimation des données MongoDB\n-- Pour les vraies données MongoDB, utilisez le plugin MongoDB\nSELECT 'Check MongoDB' as \"⚠️ Raw Data (MongoDB)\";\n-- Remplacez cette requête par une vraie requête MongoDB si le plugin est configuré",
+          "rawSql": "-- Récupère le nombre de documents MongoDB depuis la table de monitoring\nSELECT \n  COALESCE(MAX(document_count), 0) as \"📊 Raw Data (MongoDB)\"\nFROM mongodb_stats \nWHERE collection_name = 'polymarket'\n  AND timestamp >= NOW() - INTERVAL '1 hour';",
           "refId": "A"
         }
       ],
-      "title": "📊 Raw Data Count (MongoDB - See Note)",
+      "title": "📊 Raw Data Count (MongoDB)",
       "type": "stat"
     },
     {
@@ -240,7 +240,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "-- Comparaison de la qualité des données\nSELECT \n  'Cleaned Data (PostgreSQL)' as \"Data Source\",\n  COUNT(*) as \"Total Records\",\n  COUNT(DISTINCT category) as \"Unique Categories\",\n  COUNT(CASE WHEN image IS NOT NULL AND image != '' THEN 1 END) as \"With Images\",\n  COUNT(CASE WHEN icon IS NOT NULL AND icon != '' THEN 1 END) as \"With Icons\",\n  COUNT(CASE WHEN series_slug IS NOT NULL AND series_slug != '' THEN 1 END) as \"With Series\",\n  ROUND((COUNT(CASE WHEN image IS NOT NULL AND image != '' AND icon IS NOT NULL AND icon != '' THEN 1 END)::numeric / NULLIF(COUNT(*), 0) * 100), 2) as \"Data Quality %\"\nFROM polymarket_cleaned\n\nUNION ALL\n\nSELECT \n  'Note: MongoDB Stats' as \"Data Source\",\n  NULL as \"Total Records\",\n  NULL as \"Unique Categories\",\n  NULL as \"With Images\",\n  NULL as \"With Icons\",\n  NULL as \"With Series\",\n  NULL as \"Data Quality %\";\n-- Pour MongoDB: Utilisez le plugin MongoDB datasource pour obtenir les vraies données",
+          "rawSql": "-- Comparaison de la qualité des données\nSELECT \n  'Cleaned Data (PostgreSQL)' as \"Data Source\",\n  COUNT(*) as \"Total Records\",\n  COUNT(DISTINCT category) as \"Unique Categories\",\n  COUNT(CASE WHEN image IS NOT NULL AND image != '' THEN 1 END) as \"With Images\",\n  COUNT(CASE WHEN icon IS NOT NULL AND icon != '' THEN 1 END) as \"With Icons\",\n  COUNT(CASE WHEN series_slug IS NOT NULL AND series_slug != '' THEN 1 END) as \"With Series\",\n  ROUND((COUNT(CASE WHEN image IS NOT NULL AND image != '' AND icon IS NOT NULL AND icon != '' THEN 1 END)::numeric / NULLIF(COUNT(*), 0) * 100), 2) as \"Data Quality %\"\nFROM polymarket_cleaned\n\nUNION ALL\n\nSELECT \n  'Raw Data (MongoDB)' as \"Data Source\",\n  MAX(document_count) as \"Total Records\",\n  NULL as \"Unique Categories\",\n  NULL as \"With Images\",\n  NULL as \"With Icons\",\n  NULL as \"With Series\",\n  NULL as \"Data Quality %\"\nFROM mongodb_stats\nWHERE collection_name = 'polymarket'\n  AND timestamp >= NOW() - INTERVAL '1 hour';",
           "refId": "A"
         }
       ],
