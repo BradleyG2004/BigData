@@ -7,7 +7,7 @@ Ce DAG gère uniquement la partie Kafka du pipeline:
 2. Fetch API → Envoyer à Kafka (Producer)
 3. Consommer depuis Kafka → Insérer dans MongoDB (Consumer)
 
-Trigger: Manuel uniquement
+Schedule: Toutes les 5 minutes (automatique)
 Auteur: Data Pipeline Team
 """
 
@@ -198,8 +198,8 @@ def print_summary():
     print("="*70)
     print("\n💡 Prochaines étapes:")
     print("   1. Vérifier les données dans MongoDB collection 'polymarket'")
-    print("   2. Déclencher le DAG complet pour le cleaning et PostgreSQL")
-    print("   3. Consulter les dashboards Grafana")
+    print("   2. Le DAG se ré-exécutera automatiquement dans 5 minutes")
+    print("   3. Consulter les dashboards Grafana pour voir les stats")
     print("="*70)
 
 
@@ -233,13 +233,13 @@ with DAG(
     3. **run_consumer**: Kafka → MongoDB (collection 'polymarket')
     4. **summary**: Affiche le résumé
     
-    ## 🔧 Trigger
-    - **Manuel uniquement** via l'UI Airflow ou CLI
-    - Pas de schedule automatique
+    ## 🔧 Schedule
+    - **Automatique toutes les 5 minutes**
+    - Peut aussi être déclenché manuellement via l'UI Airflow
     
     ## 📊 Résultat
     - Données brutes dans MongoDB collection: `polymarket`
-    - Prêt pour le cleaning et le chargement PostgreSQL
+    - Collecte continue et mise à jour régulière
     
     ## 🔗 DAGs liés
     - `polymarket_data_pipeline`: Pipeline complet (cleaning + PostgreSQL + Spark)
