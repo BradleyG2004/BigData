@@ -152,8 +152,8 @@ def clean_polymarket_data(client, db_name=None):
             # Show statistics
             print(f"\n📊 Cleaning summary:")
             print(f"   - Source documents: {total_docs}")
-            print(f"   - Filtered documents: {filtered_count}")
-            print(f"   - Excluded documents: {total_docs - filtered_count}")
+            print(f"   - Documents nettoyés: {filtered_count}")
+            # print(f"   - Excluded documents: {total_docs - filtered_count}")  # Plus d'exclusion
             print(f"   - Cleaned & inserted: {total_inserted}")
             print(f"   - Total in 'cleaned' collection: {target_collection.count_documents({})}")
             

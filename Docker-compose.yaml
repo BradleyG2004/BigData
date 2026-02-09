@@ -249,7 +249,7 @@ services:
       "
     environment:
       - MONGO_URI=${MONGO_URI}
-      - MONGO_DB=${MONGO_DB:-polymarket}
+      - MONGO_DB=${MONGO_DB:-Polymarket}
       - POSTGRES_HOST=postgres-polymarket
       - POSTGRES_PORT=5432
       - POSTGRES_DB=polymarket

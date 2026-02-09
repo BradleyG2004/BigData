@@ -270,20 +270,21 @@ def clean_polymarket_data_task():
             'commentsEnabled', 'subcategory', 'closed', 'active', 'showMarketImages'
         ]
         
-        # Critères de filtrage
-        filter_query = {
-            'image': {'$exists': True, '$ne': ''},
-            'icon': {'$exists': True, '$ne': ''},
-            'seriesSlug': {'$exists': True, '$ne': ''},
-            'resolutionSource': {'$exists': True, '$ne': ''}
-        }
+        # Critères de filtrage: DÉSACTIVÉ - Prend TOUS les documents
+        # Si vous voulez filtrer, décommentez les lignes ci-dessous
+        # filter_query = {
+        #     'image': {'$exists': True, '$ne': ''},
+        #     'icon': {'$exists': True, '$ne': ''},
+        #     'seriesSlug': {'$exists': True, '$ne': ''},
+        #     'resolutionSource': {'$exists': True, '$ne': ''}
+        # }
         
-        print(f"\n🔍 Filtrage des documents...")
-        filtered_docs = list(source_collection.find(filter_query))
+        print(f"\n🔍 Récupération de tous les documents...")
+        filtered_docs = list(source_collection.find({}))  # Pas de filtrage
         filtered_count = len(filtered_docs)
         
-        print(f"   ✓ Trouvé {filtered_count} documents valides")
-        print(f"   ✗ Exclu {total_docs - filtered_count} documents")
+        print(f"   ✓ Total: {filtered_count} documents à nettoyer")
+        # print(f"   ✗ Exclu {total_docs - filtered_count} documents")  # Plus de filtrage
         
         if filtered_count == 0:
             print("\n⚠️  Aucun document ne correspond aux critères")
@@ -312,8 +313,8 @@ def clean_polymarket_data_task():
         print(f"\n✅ {total_inserted} documents nettoyés et insérés!")
         print(f"\n📊 Résumé:")
         print(f"   - Documents source: {total_docs}")
-        print(f"   - Filtrés: {filtered_count}")
-        print(f"   - Exclus: {total_docs - filtered_count}")
+        print(f"   - Documents nettoyés: {filtered_count}")
+        # print(f"   - Exclus: {total_docs - filtered_count}")  # Plus d'exclusion
         print(f"   - Insérés: {total_inserted}")
         
         client.close()
