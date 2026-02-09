@@ -1,7 +1,12 @@
-# Dépendances pour le Producer (API → Kafka)
+# Dépendances pour les scripts Python
 requests==2.31.0
 kafka-python==2.0.2
 python-dotenv==1.0.0
-
-# Dépendances pour le Consumer (Kafka → MongoDB)
 pymongo==4.6.1
+
+# Dépendances pour Spark (optionnel - si vous exécutez Spark en dehors de Docker)
+# pyspark==3.5.0
+
+# Note: Airflow et ses dépendances sont gérées par le conteneur Docker
+# Les scripts Python utilisés par Airflow DAG ont accès aux packages de l'image Airflow
+# Si besoin de packages supplémentaires, créez un Dockerfile custom basé sur apache/airflow

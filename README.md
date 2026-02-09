@@ -1,202 +1,186 @@
-# 📊 Polymarket Data Pipeline
+# 📊 Polymarket Data Pipeline - Orchestration Airflow
 
-Pipeline de données en temps réel pour collecter les événements Polymarket via Kafka et MongoDB.
+> Pipeline de données orchestré par **Apache Airflow** pour collecter, traiter et monitorer les événements Polymarket.
 
-## 🏗️ Architecture
+## 🏗️ Architecture avec Orchestration
 
 ```
-API Polymarket → Producer (Python) → Kafka → Consumer (Python) → MongoDB
+                    ┌─────────────┐
+                    │   Airflow   │ (Orchestrateur)
+                    │  Scheduler  │
+                    └──────┬──────┘
+                           │
+            ┌──────────────┼──────────────┐
+            │              │              │
+            ▼              ▼              ▼
+      ┌─────────┐    ┌─────────┐   ┌─────────┐
+      │  Task 1 │    │  Task 2 │   │  Task 3 │
+      │ API→Kafka│───▶│Kafka→Mongo──▶│  Spark  │
+      └─────────┘    └─────────┘   └─────────┘
+            │              │              │
+            ▼              ▼              ▼
+      [Kafka Topic]  [MongoDB Atlas]  [Analytics]
+                           ▲
+                           │
+                    [Monitoring MongoDB]
 ```
 
-### Flux de données :
-1. **Producer (`producer.py`)** : Récupère les données de l'API Polymarket et les envoie à Kafka
-2. **Kafka** : Message broker pour le streaming des données
-3. **Consumer (`consumer.py`)** : Lit les messages depuis Kafka et les insère dans MongoDB
-
-## 📋 Prérequis
-
-- Python 3.8+
-- Docker & Docker Compose
-- Compte MongoDB Atlas (ou instance MongoDB locale)
-
-## 🚀 Installation
-
-### 1. Installer les dépendances Python
+## 🚀 Démarrage Rapide
 
 ```bash
-pip install requests kafka-python pymongo python-dotenv
-```
-
-### 2. Configuration de l'environnement
-
-Créer un fichier `.env` à la racine du projet :
-
-```bash
+# 1. Configuration
 cp .env.example .env
-```
+# Éditer .env : remplir MONGO_URI
 
-Éditer le fichier `.env` avec vos propres valeurs :
+# 2. Créer dossiers Airflow
+mkdir -p dags logs plugins config
 
-```env
-# API Polymarket
-POLYMARKET_API_URL=https://gamma-api.polymarket.com/events
-
-# Kafka
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-KAFKA_TOPIC=polymarket-events
-KAFKA_GROUP_ID=polymarket-mongo-consumer
-
-# MongoDB
-MONGO_URI=mongodb+srv://<votre-username>:<votre-password>@<votre-cluster>.mongodb.net/
-DB2=polymarket_db
-MONGO_COLLECTION=polymarket
-
-# Consumer
-BATCH_SIZE=100
-```
-
-### 3. Démarrer Kafka avec Docker
-
-```bash
+# 3. Démarrer
 docker-compose up -d
+
+# 4. Accéder à Airflow
+# http://localhost:8081
+# Username: admin / Password: admin
+
+# 5. Activer le DAG
+# Cliquer sur le toggle dans l'UI Airflow
 ```
 
-Vérifier que Kafka est bien démarré :
+## 📊 Workflow du DAG
 
-```bash
-docker ps
+```
+1. check_kafka_ready (vérifie Kafka disponible)
+      ↓
+2. fetch_api_send_kafka (API → Kafka)
+      ↓
+3. consume_kafka_insert_mongo (Kafka → MongoDB)
+      ↓  
+4. spark_processing (traitement analytics)
 ```
 
-## 🎯 Utilisation
+### Schedule
 
-### Option 1 : Exécution manuelle (recommandé pour le développement)
+Par défaut : **@hourly** (toutes les heures)
 
-#### Terminal 1 : Démarrer le Consumer
-```bash
-python consumer.py
+Modifiable dans `dags/polymarket_pipeline_dag.py` :
+```python
+schedule_interval='@hourly'  # ou @daily, @weekly, cron syntax, etc.
 ```
 
-Le consumer va se mettre en attente de messages depuis Kafka et les insérera automatiquement dans MongoDB.
+## 🔍 Monitoring
 
-#### Terminal 2 : Lancer le Producer
-```bash
-python producer.py
-```
+### Airflow UI
+- **URL** : http://localhost:8081
+- **Graph View** : Visualisation du workflow
+- **Logs** : Logs détaillés de chaque task
+- **Stats** : Performance et historique
 
-Le producer va récupérer les données de l'API Polymarket et les envoyer à Kafka. Le consumer les recevra automatiquement et les insérera dans MongoDB.
+### MongoDB Atlas - `polymarket_monitoring`
 
-### Option 2 : Exécution en arrière-plan
+Collections :
+- `pipeline_metrics` : Exécutions des pipelines
+- `batch_inserts` : Performance des insertions
+- `kafka_metrics` : Métriques Kafka
+- `error_logs` : Erreurs capturées
 
-#### Windows PowerShell :
-```powershell
-# Démarrer le consumer en arrière-plan
-Start-Process python -ArgumentList "consumer.py" -NoNewWindow
-
-# Attendre quelques secondes
-Start-Sleep -Seconds 3
-
-# Lancer le producer
-python producer.py
-```
-
-#### Linux/Mac :
-```bash
-# Démarrer le consumer en arrière-plan
-python consumer.py &
-
-# Lancer le producer
-python producer.py
-```
-
-## 📊 Monitoring
-
-### Vérifier les topics Kafka
-
-```bash
-docker exec -it broker kafka-topics.sh --bootstrap-server localhost:9092 --list
-```
-
-### Vérifier les messages dans Kafka
-
-```bash
-docker exec -it broker kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic polymarket-events --from-beginning --max-messages 10
-```
-
-### Vérifier les données dans MongoDB
-
-Utiliser MongoDB Compass ou le shell MongoDB :
-
-```javascript
-use polymarket_db
-db.polymarket.countDocuments()
-db.polymarket.find().limit(5)
-```
+### Spark UI
+- **URL** : http://localhost:8080
+- Jobs et workers
 
 ## 🛠️ Troubleshooting
 
-### Le producer ne peut pas se connecter à Kafka
+### DAG n'apparaît pas
 
 ```bash
-# Vérifier que Kafka est démarré
-docker ps
+# Vérifier les logs
+docker logs airflow-scheduler
 
-# Redémarrer Kafka si nécessaire
-docker-compose restart broker
+# Lister les DAGs
+docker exec airflow-scheduler airflow dags list
 ```
 
-### Le consumer ne reçoit pas de messages
+### Erreur Kafka
 
 ```bash
-# Vérifier que le topic existe
-docker exec -it broker kafka-topics.sh --bootstrap-server localhost:9092 --list
+# Vérifier Kafka
+docker ps | grep broker
+docker logs broker
 
-# Vérifier les offsets du consumer group
-docker exec -it broker kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group polymarket-mongo-consumer --describe
+# Tester la connexion
+docker exec airflow-webserver python -c "
+from kafka import KafkaProducer
+p = KafkaProducer(bootstrap_servers='broker:9092')
+print('✅ Kafka OK')
+p.close()
+"
 ```
 
-### Erreur de connexion MongoDB
+### Erreur MongoDB
 
-- Vérifier que `MONGO_URI` est bien configuré dans `.env`
-- Vérifier que votre IP est autorisée dans MongoDB Atlas (Network Access)
-- Vérifier les credentials (username/password)
+Vérifier :
+1. `MONGO_URI` dans `.env`
+2. IP whitelisted dans MongoDB Atlas
+3. Credentials corrects
 
-## 🧹 Nettoyage
-
-### Arrêter et supprimer Kafka
-
-```bash
-docker-compose down
-```
-
-### Supprimer les données Kafka (si volumes configurés)
+### Réinitialisation complète
 
 ```bash
 docker-compose down -v
+rm -rf logs/*
+docker-compose up -d
 ```
 
-## 📝 Scripts disponibles
+## 📝 Variables Clés (.env)
 
-- **`producer.py`** : Récupère les données de l'API et les envoie à Kafka
-- **`consumer.py`** : Consomme depuis Kafka et insère dans MongoDB
-- **`PolymarketData.py`** : (Ancien script - conservé pour référence)
+```env
+# Requis
+POLYMARKET_API_URL=https://gamma-api.polymarket.com/events
+MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/
 
-## ⚙️ Variables d'environnement
+# Optionnel (valeurs par défaut OK)
+KAFKA_BOOTSTRAP_SERVERS=broker:9092
+KAFKA_TOPIC=polymarket-events
+DB2=polymarket_db
+MONITORING_DB=polymarket_monitoring
+BATCH_SIZE=100
+```
 
-| Variable | Description | Valeur par défaut |
-|----------|-------------|-------------------|
-| `POLYMARKET_API_URL` | URL de l'API Polymarket | https://gamma-api.polymarket.com/events |
-| `KAFKA_BOOTSTRAP_SERVERS` | Adresse du broker Kafka | localhost:9092 |
-| `KAFKA_TOPIC` | Nom du topic Kafka | polymarket-events |
-| `KAFKA_GROUP_ID` | ID du groupe de consommateurs | polymarket-mongo-consumer |
-| `MONGO_URI` | URI de connexion MongoDB | - (requis) |
-| `DB2` | Nom de la base de données | polymarket_db |
-| `MONGO_COLLECTION` | Nom de la collection | polymarket |
-| `BATCH_SIZE` | Taille du batch pour MongoDB | 100 |
+## 🎓 Pourquoi Airflow ?
 
-## 📄 Licence
+### Avantages
 
-Projet éducatif - Big Data Architecture
+✅ **Orchestration** : Enchaînement automatique des tâches  
+✅ **Scheduling** : Exécution programmée (hourly, daily, etc.)  
+✅ **Retry Logic** : Relance automatique en cas d'échec  
+✅ **Monitoring** : UI complète pour suivre tout  
+✅ **Alerting** : Notifications en cas de problème  
+✅ **Scalabilité** : Facile d'ajouter des tasks  
 
+### Cas d'usage
 
+- ✅ Pipeline batch régulier (hourly, daily)
+- ✅ Dépendances entre tasks
+- ✅ Besoin de retry automatique
+- ✅ Équipe qui a besoin de visibilité
 
-![alt text](image.png)
+## 🔄 Évolution du Projet
+
+### Version 1.0 (Sans orchestration)
+- Scripts Python indépendants
+- Consumer en boucle infinie
+- Lancement manuel
+
+### Version 2.0 (Avec Airflow) ← Actuel
+- Orchestration Airflow
+- Consumer déclenché par task
+- Monitoring MongoDB intégré
+- Scheduling automatique
+
+## 📚 Documentation
+
+- [README_FULL.md](README.md) - Documentation complète
+- [dags/polymarket_pipeline_dag.py](dags/polymarket_pipeline_dag.py) - Code du DAG
+
+---
+
+**Quick Start** : `docker-compose up -d` → http://localhost:8081 → Activer le DAG 🚀

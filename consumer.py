@@ -1,16 +1,22 @@
 import os
 import sys
 import json
+import time
+import traceback
 from kafka import KafkaConsumer
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from dotenv import load_dotenv
+from monitoring import get_monitoring_service
 
 # ⚠️ Assure-toi d'avoir installé les dépendances côté Python :
-#   pip install kafka-python pymongo python-dotenv
+#   pip install kafka-python pymongo python-dotenv psycopg2-binary
 
 # Load environment variables
 load_dotenv()
+
+# Service de monitoring
+monitoring = get_monitoring_service()
 
 # ================================
 # 🔧 Configuration
@@ -105,22 +111,42 @@ def insert_batch_to_mongodb(collection, batch):
     """
     try:
         if batch:
+            start_time = time.time()
             result = collection.insert_many(batch)
-            print(f"   ✓ Inséré : {len(result.inserted_ids)} documents")
-            return len(result.inserted_ids)
+            duration_ms = int((time.time() - start_time) * 1000)
+            
+            inserted_count = len(result.inserted_ids)
+            print(f"   ✓ Inséré : {inserted_count} documents en {duration_ms}ms")
+            
+            # Log vers PostgreSQL
+            monitoring.log_mongodb_stats(
+                collection_name=collection.name,
+                document_count=collection.count_documents({}),
+                insert_count=inserted_count,
+                insert_duration_ms=duration_ms
+            )
+            
+            return inserted_count
         return 0
     except Exception as e:
         print(f"   ❌ Erreur lors de l'insertion : {e}")
+        monitoring.log_error(
+            source='consumer',
+            error_type='mongodb_insert_error',
+            error_message=str(e),
+            stack_trace=traceback.format_exc()
+        )
         return 0
 
 
-def consume_and_insert(consumer, collection):
+def consume_and_insert(consumer, collection, run_id=None):
     """
     Consomme les messages de Kafka et les insère dans MongoDB par batch
     
     Args:
         consumer: instance de KafkaConsumer
         collection: collection MongoDB
+        run_id: ID du run pour le monitoring
     """
     print("\n📨 Démarrage de la consommation des messages Kafka...")
     print(f"   - Taille du batch : {BATCH_SIZE}")
@@ -129,18 +155,31 @@ def consume_and_insert(consumer, collection):
     
     batch = []
     total_inserted = 0
+    message_count = 0
     
     try:
         for message in consumer:
             # Récupération des données du message
             data = message.value
             batch.append(data)
+            message_count += 1
             
             # Insertion par batch
             if len(batch) >= BATCH_SIZE:
                 inserted = insert_batch_to_mongodb(collection, batch)
                 total_inserted += inserted
+                
+                # Log métriques Kafka
+                monitoring.log_kafka_metrics(
+                    topic=KAFKA_TOPIC,
+                    partition=message.partition,
+                    offset=message.offset,
+                    messages_count=message_count,
+                    consumer_group=KAFKA_GROUP_ID
+                )
+                
                 batch = []
+                message_count = 0
                 print(f"   📊 Total inséré jusqu'à maintenant : {total_inserted} documents\n")
     
     except KeyboardInterrupt:
@@ -158,11 +197,22 @@ def consume_and_insert(consumer, collection):
     except Exception as e:
         print(f"\n❌ Erreur lors de la consommation : {e}")
         
+        monitoring.log_error(
+            source='consumer',
+            error_type='consumption_error',
+            error_message=str(e),
+            stack_trace=traceback.format_exc()
+        )
+        
         # Insérer le dernier batch en cas d'erreur
         if batch:
             print(f"\n💾 Tentative d'insertion du dernier batch...")
             inserted = insert_batch_to_mongodb(collection, batch)
             total_inserted += inserted
+    
+    # Mettre à jour le monitoring
+    if run_id:
+        monitoring.log_pipeline_end(run_id, 'success', total_inserted)
     
     return total_inserted
 
@@ -201,11 +251,25 @@ def main():
     # ================================
     # 3) Consommation et insertion
     # ================================
+    
+    # Démarrer le monitoring
+    run_id = monitoring.log_pipeline_start(
+        run_type='consumer',
+        metadata={
+            'kafka_topic': KAFKA_TOPIC,
+            'kafka_group': KAFKA_GROUP_ID,
+            'mongodb_collection': f"{MONGO_DB_NAME}.{MONGO_COLLECTION_NAME}",
+            'batch_size': BATCH_SIZE
+        }
+    )
+    
     try:
-        total = consume_and_insert(consumer, collection)
+        total = consume_and_insert(consumer, collection, run_id)
         print(f"\n🎉 Processus terminé! Total de documents insérés : {total}")
     except Exception as e:
         print(f"\n❌ Erreur fatale : {e}")
+        if run_id:
+            monitoring.log_pipeline_end(run_id, 'failed', 0, str(e))
     finally:
         # ================================
         # 4) Nettoyage

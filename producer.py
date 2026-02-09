@@ -1,15 +1,20 @@
 import os
 import sys
 import json
+import traceback
 import requests
 from kafka import KafkaProducer
 from dotenv import load_dotenv
+from monitoring import get_monitoring_service
 
 # ⚠️ Assure-toi d'avoir installé les dépendances côté Python :
-#   pip install requests kafka-python python-dotenv
+#   pip install requests kafka-python python-dotenv psycopg2-binary
 
 # Load environment variables
 load_dotenv()
+
+# Service de monitoring
+monitoring = get_monitoring_service()
 
 # ================================
 # 🔧 Configuration
@@ -141,6 +146,16 @@ def send_to_kafka(producer, data, topic=KAFKA_TOPIC):
 
     except Exception as e:
         print(f"❌ Erreur lors de l'envoi des messages à Kafka : {e}")
+        
+        monitoring.log_error(
+            source='producer',
+            error_type='kafka_send_error',
+            error_message=str(e),
+            stack_trace=traceback.format_exc(),
+            context={'topic': topic, 'data_count': len(data)}
+        )
+        
+        raise  # Re-raise pour que main() puisse gérer l'erreur
 
 
 def main():
@@ -149,42 +164,68 @@ def main():
     print("    Polymarket Data Producer (API → Kafka)")
     print("=" * 60)
     
-    # ================================
-    # 1) Création du producteur Kafka
-    # ================================
-    producer = create_kafka_producer()
-    if not producer:
-        print("\n❌ Impossible de créer le producteur Kafka. Arrêt du script.")
-        sys.exit(1)
-
-    # ================================
-    # 2) Récupération des données de l'API
-    # ================================
-    limit = 100
-    print(f"\n📌 Configuré pour récupérer {limit} événements")
-
-    data = fetch_polymarket_data(limit=limit)
-
-    if not data:
-        print("\n⚠️  Aucune donnée récupérée depuis l'API Polymarket")
-        producer.close()
-        sys.exit(0)
-
-    # ================================
-    # 3) Envoi vers Kafka
-    # ================================
-    send_to_kafka(producer, data)
-
-    # ================================
-    # 4) Nettoyage
-    # ================================
+    # Démarrer le monitoring
+    run_id = monitoring.log_pipeline_start(
+        run_type='producer',
+        metadata={
+            'api_url': POLYMARKET_API_URL,
+            'kafka_topic': KAFKA_TOPIC
+        }
+    )
+    
     try:
-        producer.close()
-        print("\n✅ Producteur Kafka fermé proprement")
-    except Exception as e:
-        print(f"⚠️  Erreur lors de la fermeture : {e}")
+        # ================================
+        # 1) Création du producteur Kafka
+        # ================================
+        producer = create_kafka_producer()
+        if not producer:
+            print("\n❌ Impossible de créer le producteur Kafka. Arrêt du script.")
+            monitoring.log_pipeline_end(run_id, 'failed', 0, 'Failed to create Kafka producer')
+            sys.exit(1)
 
-    print("\n🎉 Processus terminé avec succès!")
+        # ================================
+        # 2) Récupération des données de l'API
+        # ================================
+        limit = 100
+        print(f"\n📌 Configuré pour récupérer {limit} événements")
+
+        data = fetch_polymarket_data(limit=limit)
+
+        if not data:
+            print("\n⚠️  Aucune donnée récupérée depuis l'API Polymarket")
+            producer.close()
+            monitoring.log_pipeline_end(run_id, 'success', 0)
+            sys.exit(0)
+
+        # ================================
+        # 3) Envoi vers Kafka
+        # ================================
+        send_to_kafka(producer, data)
+        
+        # Log métriques Kafka
+        monitoring.log_kafka_metrics(
+            topic=KAFKA_TOPIC,
+            messages_count=len(data)
+        )
+
+        # ================================
+        # 4) Nettoyage
+        # ================================
+        try:
+            producer.close()
+            print("\n✅ Producteur Kafka fermé proprement")
+        except Exception as e:
+            print(f"⚠️  Erreur lors de la fermeture : {e}")
+
+        print("\n🎉 Processus terminé avec succès!")
+        
+        # Terminer le monitoring avec succès
+        monitoring.log_pipeline_end(run_id, 'success', len(data))
+        
+    except Exception as e:
+        print(f"\n❌ Erreur fatale: {e}")
+        monitoring.log_pipeline_end(run_id, 'failed', 0, str(e))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
