@@ -2470,3 +2470,322 @@ File Path                                           PID  Runtime      # DAGs    
 /opt/airflow/dags/polymarket_pipeline_dag.py        309  0.01s             1           0  0.12s           2026-02-09T13:55:04
 ================================================================================
 [2026-02-09T13:55:49.693+0000] {manager.py:1129} WARNING - Skipping processing of missing file: /opt/airflow/dags/kafka_producer_consumer_dag.py
+[2026-02-09T13:56:04.832+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                       PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/polymarket_pipeline_dag.py    328  0.00s             1           0  0.16s           2026-02-09T13:55:34
+================================================================================
+[2026-02-09T13:56:35.091+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                       PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/polymarket_pipeline_dag.py    339  0.01s             1           0  0.12s           2026-02-09T13:56:04
+================================================================================
+[2026-02-09T13:57:02.317+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2026-02-09T13:57:02.352+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2026-02-09T13:57:05.436+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py                           1           0  0.11s           2026-02-09T13:57:02
+/opt/airflow/dags/polymarket_pipeline_dag.py        357  0.00s             1           0  0.13s           2026-02-09T13:56:35
+================================================================================
+[2026-02-09T13:57:35.841+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py                           1           0  0.12s           2026-02-09T13:57:32
+/opt/airflow/dags/polymarket_pipeline_dag.py        380  0.00s             1           0  0.14s           2026-02-09T13:57:05
+================================================================================
+[2026-02-09T13:58:06.280+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    399  0.03s             1           0  0.38s           2026-02-09T13:58:00
+/opt/airflow/dags/polymarket_pipeline_dag.py        402  0.01s             1           0  0.13s           2026-02-09T13:57:35
+================================================================================
+[2026-02-09T13:58:36.527+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py                           1           0  0.48s           2026-02-09T13:58:36
+/opt/airflow/dags/polymarket_pipeline_dag.py        436  0.01s             1           0  0.17s           2026-02-09T13:58:06
+================================================================================
+[2026-02-09T13:58:36.738+0000] {manager.py:451} INFO - Exiting gracefully upon receiving signal 15
+[2026-02-09T13:58:36.741+0000] {manager.py:451} INFO - Exiting gracefully upon receiving signal 15
+[2026-02-09T13:58:37.038+0000] {manager.py:451} INFO - Exiting gracefully upon receiving signal 15
+[2026-02-09T14:00:27.561+0000] {manager.py:469} INFO - Processing files using up to 2 processes at a time 
+[2026-02-09T14:00:27.562+0000] {manager.py:470} INFO - Process each file at most once every 30 seconds
+[2026-02-09T14:00:27.564+0000] {manager.py:471} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2026-02-09T14:00:27.566+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2026-02-09T14:00:27.602+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2026-02-09T14:00:27.781+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    203  0.09s             0           0
+/opt/airflow/dags/polymarket_pipeline_dag.py        206  0.05s             0           0
+================================================================================
+[2026-02-09T14:00:58.017+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                         PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py                           1           0  0.47s           2026-02-09T14:00:28
+/opt/airflow/dags/polymarket_pipeline_dag.py                               1           0  0.42s           2026-02-09T14:00:28
+================================================================================
+[2026-02-09T14:01:28.923+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    246  0.02s             1           0  0.14s           2026-02-09T14:00:58
+/opt/airflow/dags/polymarket_pipeline_dag.py        249  0.00s             1           0  0.13s           2026-02-09T14:00:58
+================================================================================
+[2026-02-09T14:01:59.399+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    264  0.02s             1           0  0.15s           2026-02-09T14:01:29
+/opt/airflow/dags/polymarket_pipeline_dag.py        267  0.00s             1           0  0.15s           2026-02-09T14:01:29
+================================================================================
+[2026-02-09T14:02:29.856+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    280  0.02s             1           0  0.11s           2026-02-09T14:01:59
+/opt/airflow/dags/polymarket_pipeline_dag.py        283  0.00s             1           0  0.11s           2026-02-09T14:01:59
+================================================================================
+[2026-02-09T14:03:00.265+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    296  0.02s             1           0  0.11s           2026-02-09T14:02:29
+/opt/airflow/dags/polymarket_pipeline_dag.py        299  0.00s             1           0  0.12s           2026-02-09T14:02:29
+================================================================================
+[2026-02-09T14:03:30.725+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    312  0.02s             1           0  0.13s           2026-02-09T14:03:00
+/opt/airflow/dags/polymarket_pipeline_dag.py        315  0.00s             1           0  0.13s           2026-02-09T14:03:00
+================================================================================
+[2026-02-09T14:04:01.170+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    335  0.03s             1           0  0.11s           2026-02-09T14:03:30
+/opt/airflow/dags/polymarket_pipeline_dag.py        338  0.00s             1           0  0.11s           2026-02-09T14:03:30
+================================================================================
+[2026-02-09T14:04:31.666+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    356  0.02s             1           0  0.13s           2026-02-09T14:04:01
+/opt/airflow/dags/polymarket_pipeline_dag.py        359  0.00s             1           0  0.11s           2026-02-09T14:04:01
+================================================================================
+[2026-02-09T14:05:02.138+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    417  0.03s             1           0  0.15s           2026-02-09T14:04:31
+/opt/airflow/dags/polymarket_pipeline_dag.py        420  0.00s             1           0  0.15s           2026-02-09T14:04:31
+================================================================================
+[2026-02-09T14:05:28.494+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2026-02-09T14:05:28.548+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2026-02-09T14:05:32.652+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    455  0.02s             1           0  0.14s           2026-02-09T14:05:02
+/opt/airflow/dags/polymarket_pipeline_dag.py        458  0.00s             1           0  0.14s           2026-02-09T14:05:02
+================================================================================
+[2026-02-09T14:06:03.038+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    558  0.02s             1           0  0.12s           2026-02-09T14:05:32
+/opt/airflow/dags/polymarket_pipeline_dag.py        561  0.00s             1           0  0.12s           2026-02-09T14:05:32
+================================================================================
+[2026-02-09T14:06:33.491+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    619  0.02s             1           0  0.11s           2026-02-09T14:06:03
+/opt/airflow/dags/polymarket_pipeline_dag.py        622  0.00s             1           0  0.11s           2026-02-09T14:06:03
+================================================================================
+[2026-02-09T14:07:03.936+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    641  0.02s             1           0  0.12s           2026-02-09T14:06:33
+/opt/airflow/dags/polymarket_pipeline_dag.py        644  0.00s             1           0  0.12s           2026-02-09T14:06:33
+================================================================================
+[2026-02-09T14:07:34.343+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    666  0.03s             1           0  0.12s           2026-02-09T14:07:04
+/opt/airflow/dags/polymarket_pipeline_dag.py        669  0.01s             1           0  0.11s           2026-02-09T14:07:04
+================================================================================
+[2026-02-09T14:08:04.778+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    687  0.02s             1           0  0.17s           2026-02-09T14:07:34
+/opt/airflow/dags/polymarket_pipeline_dag.py        690  0.00s             1           0  0.18s           2026-02-09T14:07:34
+================================================================================
+[2026-02-09T14:08:35.226+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    703  0.02s             1           0  0.15s           2026-02-09T14:08:04
+/opt/airflow/dags/polymarket_pipeline_dag.py        706  0.00s             1           0  0.16s           2026-02-09T14:08:04
+================================================================================
+[2026-02-09T14:09:05.636+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    720  0.02s             1           0  0.13s           2026-02-09T14:08:35
+/opt/airflow/dags/polymarket_pipeline_dag.py        723  0.00s             1           0  0.13s           2026-02-09T14:08:35
+================================================================================
+[2026-02-09T14:09:36.039+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    736  0.03s             1           0  0.12s           2026-02-09T14:09:05
+/opt/airflow/dags/polymarket_pipeline_dag.py        739  0.01s             1           0  0.11s           2026-02-09T14:09:05
+================================================================================
+[2026-02-09T14:10:06.535+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    756  0.02s             1           0  0.18s           2026-02-09T14:09:36
+/opt/airflow/dags/polymarket_pipeline_dag.py        759  0.00s             1           0  0.19s           2026-02-09T14:09:36
+================================================================================
+[2026-02-09T14:10:28.850+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2026-02-09T14:10:28.881+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2026-02-09T14:10:37.000+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    778  0.02s             1           0  0.14s           2026-02-09T14:10:06
+/opt/airflow/dags/polymarket_pipeline_dag.py        781  0.00s             1           0  0.14s           2026-02-09T14:10:06
+================================================================================
+[2026-02-09T14:11:07.384+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    837  0.02s             1           0  0.12s           2026-02-09T14:10:37
+/opt/airflow/dags/polymarket_pipeline_dag.py        840  0.00s             1           0  0.12s           2026-02-09T14:10:37
+================================================================================
+[2026-02-09T14:11:37.806+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    853  0.02s             1           0  0.12s           2026-02-09T14:11:07
+/opt/airflow/dags/polymarket_pipeline_dag.py        856  0.00s             1           0  0.13s           2026-02-09T14:11:07
+================================================================================
+[2026-02-09T14:12:08.292+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    869  0.02s             1           0  0.14s           2026-02-09T14:11:37
+/opt/airflow/dags/polymarket_pipeline_dag.py        872  0.00s             1           0  0.14s           2026-02-09T14:11:37
+================================================================================
+[2026-02-09T14:12:38.718+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    885  0.02s             1           0  0.13s           2026-02-09T14:12:08
+/opt/airflow/dags/polymarket_pipeline_dag.py        888  0.00s             1           0  0.13s           2026-02-09T14:12:08
+================================================================================
+[2026-02-09T14:13:09.123+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    909  0.03s             1           0  0.13s           2026-02-09T14:12:38
+/opt/airflow/dags/polymarket_pipeline_dag.py        912  0.00s             1           0  0.13s           2026-02-09T14:12:38
+================================================================================
+[2026-02-09T14:13:39.602+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    929  0.02s             1           0  0.19s           2026-02-09T14:13:09
+/opt/airflow/dags/polymarket_pipeline_dag.py        932  0.00s             1           0  0.20s           2026-02-09T14:13:09
+================================================================================
+[2026-02-09T14:14:10.009+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                           PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/kafka_producer_consumer_dag.py    953  0.02s             1           0  0.13s           2026-02-09T14:13:39
+/opt/airflow/dags/polymarket_pipeline_dag.py        956  0.00s             1           0  0.14s           2026-02-09T14:13:39
+================================================================================
+[2026-02-09T14:14:12.403+0000] {manager.py:451} INFO - Exiting gracefully upon receiving signal 15

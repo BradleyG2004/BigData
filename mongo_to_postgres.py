@@ -21,7 +21,7 @@ load_dotenv()
 # Configuration MongoDB
 # ================================
 MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB_NAME = os.getenv('DB2', 'polymarket_db')
+MONGO_DB_NAME = os.getenv('DB2', 'polymarket')
 MONGO_COLLECTION = 'cleaned'
 
 # ================================
@@ -31,7 +31,7 @@ POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
 POSTGRES_PORT = int(os.getenv('POSTGRES_PORT', '5433'))
 POSTGRES_USER = os.getenv('POSTGRES_USER', 'polymarket')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'polymarket123')
-POSTGRES_DB = os.getenv('POSTGRES_DB', 'polymarket_db')
+POSTGRES_DB = os.getenv('POSTGRES_DB', 'polymarket')
 
 # Taille des batchs pour l'insertion
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '100'))

@@ -97,7 +97,7 @@ Options disponibles:
 
 ```powershell
 # Connexion PostgreSQL (port 5433)
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket
 ```
 
 ```sql
@@ -136,12 +136,12 @@ GROUP BY collection_name;
 ```env
 # MongoDB
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/
-MONGO_DB=polymarket_db
+MONGO_DB=polymarket
 
 # PostgreSQL (monitoring)
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5433
-POSTGRES_DB=polymarket_db
+POSTGRES_DB=polymarket
 POSTGRES_USER=polymarket
 POSTGRES_PASSWORD=polymarket123
 ```
@@ -220,7 +220,7 @@ check_kafka >> fetch >> consume >> clean >> collect_stats >> load_postgres >> sp
 python collect_mongo_stats.py
 
 # 2. Vérifier la table
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db -c "SELECT COUNT(*) FROM mongodb_stats;"
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket -c "SELECT COUNT(*) FROM mongodb_stats;"
 
 # 3. Vérifier les logs
 docker-compose logs postgres-polymarket

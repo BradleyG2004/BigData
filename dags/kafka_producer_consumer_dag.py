@@ -138,7 +138,7 @@ def run_kafka_consumer():
     print(f"📅 Timestamp: {datetime.now()}")
     print(f"🔗 Kafka Broker: {os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092')}")
     print(f"📝 Topic: {os.getenv('KAFKA_TOPIC', 'polymarket-events')}")
-    print(f"💾 MongoDB: {os.getenv('MONGO_DB', 'polymarket_db')}")
+    print(f"💾 MongoDB: {os.getenv('MONGO_DB', 'polymarket')}")
     print("="*70)
     
     # Chemin vers le script consumer

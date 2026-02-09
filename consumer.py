@@ -29,7 +29,7 @@ KAFKA_GROUP_ID = os.getenv('KAFKA_GROUP_ID', 'polymarket-mongo-consumer')
 
 # Configuration MongoDB
 MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB_NAME = os.getenv('DB2', 'polymarket_db')
+MONGO_DB_NAME = os.getenv('DB2', 'polymarket')
 MONGO_COLLECTION_NAME = os.getenv('MONGO_COLLECTION', 'polymarket')
 
 # Taille du batch pour l'insertion MongoDB

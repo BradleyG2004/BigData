@@ -63,7 +63,7 @@ Write-Host ""
 Write-Host "   🔥 Spark Master:    http://localhost:8082" -ForegroundColor White
 Write-Host ""
 Write-Host "   🗄️  PostgreSQL:     localhost:5433" -ForegroundColor White
-Write-Host "       Database:       polymarket_db" -ForegroundColor Gray
+Write-Host "       Database:       polymarket" -ForegroundColor Gray
 Write-Host "       User:           polymarket" -ForegroundColor Gray
 Write-Host "       Password:       polymarket123" -ForegroundColor Gray
 Write-Host ""

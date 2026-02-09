@@ -9,7 +9,7 @@ Configuration via .env:
     MONGO_URI=mongodb+srv://...
     POSTGRES_HOST=localhost
     POSTGRES_PORT=5433
-    POSTGRES_DB=polymarket_db
+    POSTGRES_DB=polymarket
     POSTGRES_USER=polymarket
     POSTGRES_PASSWORD=polymarket123
 """
@@ -30,13 +30,13 @@ load_dotenv()
 
 # Configuration MongoDB
 MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB = os.getenv('MONGO_DB', 'polymarket_db')
+MONGO_DB = os.getenv('MONGO_DB', 'polymarket')
 
 # Configuration PostgreSQL
 POSTGRES_CONFIG = {
     'host': os.getenv('POSTGRES_HOST', 'localhost'),
     'port': os.getenv('POSTGRES_PORT', '5433'),
-    'database': os.getenv('POSTGRES_DB', 'polymarket_db'),
+    'database': os.getenv('POSTGRES_DB', 'polymarket'),
     'user': os.getenv('POSTGRES_USER', 'polymarket'),
     'password': os.getenv('POSTGRES_PASSWORD', 'polymarket123')
 }

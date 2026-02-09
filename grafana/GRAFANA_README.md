@@ -33,7 +33,7 @@ Dashboard de comparaison entre données cleaned et raw:
 
 ### PostgreSQL - Polymarket Cleaned
 - **Type**: PostgreSQL
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **Table**: `polymarket_cleaned`
 - **Host**: `postgres-polymarket:5432`
 - **User**: `polymarket`
@@ -41,7 +41,7 @@ Dashboard de comparaison entre données cleaned et raw:
 
 ### MongoDB - Polymarket Raw
 - **Type**: MongoDB (via plugin)
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **Collections**: `polymarket` (raw), `cleaned`
 - **Connection**: Via `MONGO_URI`
 - **Status**: ⚠️ Nécessite plugin MongoDB
@@ -198,7 +198,7 @@ ORDER BY category;
 - name: MongoDB - Custom
   type: grafana-mongodb-datasource
   url: mongodb://username:password@host:27017
-  database: polymarket_db
+  database: polymarket
   jsonData:
     authSource: admin
     ssl: true
@@ -363,7 +363,7 @@ docker-compose restart grafana
 ```powershell
 docker exec -it grafana /bin/bash
 apk add postgresql-client
-psql -h postgres-polymarket -U polymarket -d polymarket_db
+psql -h postgres-polymarket -U polymarket -d polymarket
 ```
 
 ### Plugin MongoDB ne charge pas

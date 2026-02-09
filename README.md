@@ -143,13 +143,13 @@ ArchBigDatA/
 ### Étape 2: Ingestion (Kafka → MongoDB Raw)
 - **Script**: `consumer.py` ou DAG task `consume_kafka_insert_mongo`
 - **Source**: Topic Kafka `polymarket-events`
-- **Destination**: MongoDB `polymarket_db.polymarket`
+- **Destination**: MongoDB `polymarket.polymarket`
 - **Type**: Données brutes, non filtrées
 
 ### Étape 3: Nettoyage (MongoDB Raw → MongoDB Cleaned)
 - **Script**: `CleaningPolymarket.py` ou DAG task `clean_polymarket_data`
-- **Source**: MongoDB `polymarket_db.polymarket`
-- **Destination**: MongoDB `polymarket_db.cleaned`
+- **Source**: MongoDB `polymarket.polymarket`
+- **Destination**: MongoDB `polymarket.cleaned`
 - **Actions**:
   - ✅ Filtrer: image, icon, seriesSlug, resolutionSource non vides
   - ✅ Supprimer 25+ champs inutiles
@@ -157,8 +157,8 @@ ArchBigDatA/
 
 ### Étape 4: Structuration (MongoDB Cleaned → PostgreSQL)
 - **Script**: `mongo_to_postgres.py` ou DAG task `load_to_postgres`
-- **Source**: MongoDB `polymarket_db.cleaned`
-- **Destination**: PostgreSQL `polymarket_db.polymarket_cleaned`
+- **Source**: MongoDB `polymarket.cleaned`
+- **Destination**: PostgreSQL `polymarket.polymarket_cleaned`
 - **Avantages**:
   - 🔍 Requêtes SQL performantes
   - 📊 Jointures et agrégations avancées
@@ -204,10 +204,10 @@ docker-compose ps
 
 ```powershell
 # Se connecter à PostgreSQL
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket
 
 # Ou depuis Windows (si psql installé)
-psql -h localhost -p 5433 -U polymarket -d polymarket_db
+psql -h localhost -p 5433 -U polymarket -d polymarket
 
 # Requêtes utiles
 SELECT COUNT(*) FROM polymarket_cleaned;
@@ -220,7 +220,7 @@ SELECT * FROM polymarket_stats_by_category;
 ```powershell
 # Vérifier le nombre de documents
 # Via Python
-python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); client = MongoClient(os.getenv('MONGO_URI')); print('Raw:', client['polymarket_db']['polymarket'].count_documents({})); print('Cleaned:', client['polymarket_db']['cleaned'].count_documents({}))"
+python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); client = MongoClient(os.getenv('MONGO_URI')); print('Raw:', client['polymarket']['polymarket'].count_documents({})); print('Cleaned:', client['polymarket']['cleaned'].count_documents({}))"
 ```
 
 ### Kafka
@@ -251,7 +251,7 @@ docker exec broker kafka-console-consumer.sh --bootstrap-server localhost:9092 -
 
 ```sql
 -- Taille de la base
-SELECT pg_size_pretty(pg_database_size('polymarket_db'));
+SELECT pg_size_pretty(pg_database_size('polymarket'));
 
 -- Activité récente
 SELECT * FROM pipeline_runs ORDER BY start_time DESC LIMIT 10;
@@ -295,13 +295,13 @@ docker exec grafana cat /etc/grafana/provisioning/datasources/datasources.yml
 
 ```powershell
 # 1. Vérifier MongoDB cleaned
-python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); print(MongoClient(os.getenv('MONGO_URI'))['polymarket_db']['cleaned'].count_documents({}))"
+python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); print(MongoClient(os.getenv('MONGO_URI'))['polymarket']['cleaned'].count_documents({}))"
 
 # 2. Exécuter manuellement le transfert
 python mongo_to_postgres.py
 
 # 3. Vérifier PostgreSQL
-docker exec postgres-polymarket psql -U polymarket -d polymarket_db -c "SELECT COUNT(*) FROM polymarket_cleaned;"
+docker exec postgres-polymarket psql -U polymarket -d polymarket -c "SELECT COUNT(*) FROM polymarket_cleaned;"
 ```
 
 ### Problème: Kafka ne reçoit pas de messages

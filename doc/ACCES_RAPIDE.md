@@ -24,20 +24,20 @@
 ### PostgreSQL - Données Polymarket
 - **Host**: `localhost`
 - **Port**: `5433`
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **Username**: `polymarket`
 - **Password**: `polymarket123`
 
 **Connexion via psql**:
 ```bash
-psql -h localhost -p 5433 -U polymarket -d polymarket_db
+psql -h localhost -p 5433 -U polymarket -d polymarket
 ```
 
 **Connexion via DBeaver/pgAdmin**:
 ```
 Host: localhost
 Port: 5433
-Database: polymarket_db
+Database: polymarket
 Username: polymarket
 Password: polymarket123
 ```
@@ -52,7 +52,7 @@ Password: polymarket123
 
 ### MongoDB Atlas
 - **URI**: Configurer dans `.env`
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **Collections**:
   - `polymarket` - Données brutes (raw)
   - `cleaned` - Données nettoyées
@@ -86,7 +86,7 @@ docker exec broker kafka-topics.sh --bootstrap-server localhost:9092 --list
 - **Name**: `PostgreSQL - Polymarket Cleaned`
 - **Type**: PostgreSQL
 - **Host**: `postgres-polymarket:5432`
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **User**: `polymarket`
 - **Status**: ✅ Configuré automatiquement
 
@@ -94,7 +94,7 @@ docker exec broker kafka-topics.sh --bootstrap-server localhost:9092 --list
 - **Name**: `MongoDB - Polymarket Raw`
 - **Type**: MongoDB (plugin requis)
 - **URI**: Variable `MONGO_URI` de `.env`
-- **Database**: `polymarket_db`
+- **Database**: `polymarket`
 - **Status**: ⚠️ Nécessite installation du plugin
 
 ## 📊 Tables PostgreSQL Importantes
@@ -174,7 +174,7 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5433
 POSTGRES_USER=votre_user_securise
 POSTGRES_PASSWORD=votre_password_securise
-POSTGRES_DB=polymarket_db
+POSTGRES_DB=polymarket
 
 # Grafana
 GRAFANA_ADMIN_USER=admin_grafana
@@ -190,7 +190,7 @@ KAFKA_TOPIC=polymarket-events
 
 # Général
 BATCH_SIZE=100
-DB2=polymarket_db
+DB2=polymarket
 ```
 
 ## 🚀 Quick Access

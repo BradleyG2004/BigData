@@ -8,7 +8,7 @@ datasources:
     type: postgres
     access: proxy
     url: postgres-polymarket:5432
-    database: polymarket_db
+    database: polymarket
     user: polymarket
     secureJsonData:
       password: polymarket123
@@ -30,6 +30,6 @@ datasources:
   # 1. Aller dans Configuration → Data Sources → Add data source
   # 2. Chercher "MongoDB" et installer le plugin si nécessaire
   # 3. Configurer avec votre MONGO_URI depuis .env
-  # 4. Database: polymarket_db
+  # 4. Database: polymarket
   # 5. Collections: polymarket (raw), cleaned
 

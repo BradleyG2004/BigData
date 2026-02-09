@@ -21,7 +21,7 @@ API Polymarket → Kafka → MongoDB (raw) → Nettoyage → MongoDB (cleaned) �
 - **Credentials par défaut**:
   - User: `polymarket`
   - Password: `polymarket123`
-  - Database: `polymarket_db`
+  - Database: `polymarket`
 
 ### 2. Table principale: `polymarket_cleaned`
 
@@ -90,7 +90,7 @@ POSTGRES_HOST=localhost          # Utilisez 'postgres-polymarket' dans Docker
 POSTGRES_PORT=5433               # Port exposé sur l'hôte
 POSTGRES_USER=polymarket
 POSTGRES_PASSWORD=polymarket123
-POSTGRES_DB=polymarket_db
+POSTGRES_DB=polymarket
 ```
 
 ### Docker Compose
@@ -120,20 +120,20 @@ docker-compose logs postgres-polymarket
 
 ```bash
 # Via psql
-psql -h localhost -p 5433 -U polymarket -d polymarket_db
+psql -h localhost -p 5433 -U polymarket -d polymarket
 
 # Via pgAdmin ou DBeaver
 Host: localhost
 Port: 5433
 User: polymarket
 Password: polymarket123
-Database: polymarket_db
+Database: polymarket
 ```
 
 #### Depuis un container Docker:
 
 ```bash
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket
 ```
 
 ### 3. Exécution manuelle du transfert
@@ -254,10 +254,10 @@ docker exec -it postgres-polymarket pg_isready -U polymarket
 
 ```bash
 # Vérifier que les scripts d'initialisation ont été exécutés
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db -c "\dt"
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket -c "\dt"
 
 # Si nécessaire, réexécuter l'initialisation
-docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db -f /docker-entrypoint-initdb.d/02-polymarket-schema.sql
+docker exec -it postgres-polymarket psql -U polymarket -d polymarket -f /docker-entrypoint-initdb.d/02-polymarket-schema.sql
 ```
 
 ### Les données ne sont pas transférées
@@ -266,7 +266,7 @@ docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db -f /dock
    ```python
    from pymongo import MongoClient
    client = MongoClient(MONGO_URI)
-   print(client['polymarket_db']['cleaned'].count_documents({}))
+   print(client['polymarket']['cleaned'].count_documents({}))
    ```
 
 2. Exécuter manuellement le script de transfert:
@@ -282,17 +282,17 @@ docker exec -it postgres-polymarket psql -U polymarket -d polymarket_db -f /dock
 
 ```bash
 # Backup complet
-docker exec postgres-polymarket pg_dump -U polymarket polymarket_db > backup_$(date +%Y%m%d).sql
+docker exec postgres-polymarket pg_dump -U polymarket polymarket > backup_$(date +%Y%m%d).sql
 
 # Backup de la table uniquement
-docker exec postgres-polymarket pg_dump -U polymarket -t polymarket_cleaned polymarket_db > backup_table_$(date +%Y%m%d).sql
+docker exec postgres-polymarket pg_dump -U polymarket -t polymarket_cleaned polymarket > backup_table_$(date +%Y%m%d).sql
 ```
 
 ### Restauration
 
 ```bash
 # Restaurer depuis un backup
-cat backup_20260209.sql | docker exec -i postgres-polymarket psql -U polymarket polymarket_db
+cat backup_20260209.sql | docker exec -i postgres-polymarket psql -U polymarket polymarket
 ```
 
 ### Nettoyage des anciennes données

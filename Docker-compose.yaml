@@ -15,7 +15,7 @@ x-airflow-common:
     KAFKA_BOOTSTRAP_SERVERS: broker:9092
     KAFKA_TOPIC: ${KAFKA_TOPIC:-polymarket-events}
     MONGO_URI: ${MONGO_URI}
-    DB2: ${DB2:-polymarket_db}
+    DB2: ${DB2:-polymarket}
     MONGO_COLLECTION: ${MONGO_COLLECTION:-polymarket}
     BATCH_SIZE: ${BATCH_SIZE:-100}
     # Variables PostgreSQL pour les données Polymarket
@@ -23,7 +23,7 @@ x-airflow-common:
     POSTGRES_PORT: 5432
     POSTGRES_USER: ${POSTGRES_USER:-polymarket}
     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-polymarket123}
-    POSTGRES_DB: ${POSTGRES_DB:-polymarket_db}
+    POSTGRES_DB: ${POSTGRES_DB:-polymarket}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -66,14 +66,14 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-polymarket}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-polymarket123}
-      POSTGRES_DB: ${POSTGRES_DB:-polymarket_db}
+      POSTGRES_DB: ${POSTGRES_DB:-polymarket}
     ports:
       - "5433:5432"  # Port différent pour éviter conflit avec postgres-airflow
     volumes:
       - postgres-polymarket-volume:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "polymarket", "-d", "polymarket_db"]
+      test: ["CMD", "pg_isready", "-U", "polymarket", "-d", "polymarket"]
       interval: 10s
       retries: 5
       start_period: 10s
@@ -249,10 +249,10 @@ services:
       "
     environment:
       - MONGO_URI=${MONGO_URI}
-      - MONGO_DB=${MONGO_DB:-polymarket_db}
+      - MONGO_DB=${MONGO_DB:-polymarket}
       - POSTGRES_HOST=postgres-polymarket
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=polymarket_db
+      - POSTGRES_DB=polymarket
       - POSTGRES_USER=polymarket
       - POSTGRES_PASSWORD=polymarket123
     volumes:

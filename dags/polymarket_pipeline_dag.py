@@ -143,7 +143,7 @@ def consume_kafka_and_insert_mongo():
     group_id = f"airflow-consumer-{int(time.time())}"  # Unique group ID
     
     mongo_uri = os.getenv('MONGO_URI')
-    db_name = os.getenv('DB2', 'polymarket_db')
+    db_name = os.getenv('DB2', 'polymarket')
     collection_name = os.getenv('MONGO_COLLECTION', 'polymarket')
     batch_size = int(os.getenv('BATCH_SIZE', '100'))
     
@@ -235,7 +235,7 @@ def clean_polymarket_data_task():
     
     # Configuration
     mongo_uri = os.getenv('MONGO_URI')
-    db_name = os.getenv('DB2', 'polymarket_db')
+    db_name = os.getenv('DB2', 'polymarket')
     
     # Monitoring
     monitoring = get_monitoring_service()
@@ -376,13 +376,13 @@ def load_to_postgres():
     
     # Configuration
     mongo_uri = os.getenv('MONGO_URI')
-    db_name = os.getenv('DB2', 'polymarket_db')
+    db_name = os.getenv('DB2', 'polymarket')
     
     pg_host = os.getenv('POSTGRES_HOST', 'postgres-polymarket')
     pg_port = int(os.getenv('POSTGRES_PORT', '5432'))
     pg_user = os.getenv('POSTGRES_USER', 'polymarket')
     pg_password = os.getenv('POSTGRES_PASSWORD', 'polymarket123')
-    pg_db = os.getenv('POSTGRES_DB', 'polymarket_db')
+    pg_db = os.getenv('POSTGRES_DB', 'polymarket')
     
     batch_size = int(os.getenv('BATCH_SIZE', '100'))
     
