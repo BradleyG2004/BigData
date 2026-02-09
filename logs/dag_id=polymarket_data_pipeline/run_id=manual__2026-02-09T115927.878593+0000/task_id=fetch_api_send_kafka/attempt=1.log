@@ -1,0 +1,46 @@
+[2026-02-09T11:59:30.672+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: polymarket_data_pipeline.fetch_api_send_kafka manual__2026-02-09T11:59:27.878593+00:00 [queued]>
+[2026-02-09T11:59:30.683+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: polymarket_data_pipeline.fetch_api_send_kafka manual__2026-02-09T11:59:27.878593+00:00 [queued]>
+[2026-02-09T11:59:30.684+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2026-02-09T11:59:30.696+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): fetch_api_send_kafka> on 2026-02-09 11:59:27.878593+00:00
+[2026-02-09T11:59:30.700+0000] {standard_task_runner.py:60} INFO - Started process 229 to run task
+[2026-02-09T11:59:30.703+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'polymarket_data_pipeline', 'fetch_api_send_kafka', 'manual__2026-02-09T11:59:27.878593+00:00', '--job-id', '5', '--raw', '--subdir', 'DAGS_FOLDER/polymarket_pipeline_dag.py', '--cfg-path', '/tmp/tmpxlxr9baz']
+[2026-02-09T11:59:30.705+0000] {standard_task_runner.py:88} INFO - Job 5: Subtask fetch_api_send_kafka
+[2026-02-09T11:59:30.746+0000] {task_command.py:423} INFO - Running <TaskInstance: polymarket_data_pipeline.fetch_api_send_kafka manual__2026-02-09T11:59:27.878593+00:00 [running]> on host 68f43ae3703b
+[2026-02-09T11:59:30.806+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='polymarket' AIRFLOW_CTX_DAG_ID='polymarket_data_pipeline' AIRFLOW_CTX_TASK_ID='fetch_api_send_kafka' AIRFLOW_CTX_EXECUTION_DATE='2026-02-09T11:59:27.878593+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-02-09T11:59:27.878593+00:00'
+[2026-02-09T11:59:31.022+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T11:59:31.023+0000] {logging_mixin.py:188} INFO -   📡 ÉTAPE 1: API → Kafka
+[2026-02-09T11:59:31.023+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T11:59:34.795+0000] {logging_mixin.py:188} INFO - ✅ Monitoring MongoDB connecté (polymarket_monitoring.pipeline_metrics)
+[2026-02-09T11:59:34.838+0000] {logging_mixin.py:188} INFO - 
+🔄 Connexion à Kafka (broker:9092)...
+[2026-02-09T11:59:34.840+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T11:59:34.845+0000] {conn.py:622} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <checking_api_versions_recv> [IPv4 ('172.19.0.3', 9092)]>: Broker version identified as 2.6
+[2026-02-09T11:59:34.845+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T11:59:34.847+0000] {logging_mixin.py:188} INFO - ✅ Producteur Kafka créé
+[2026-02-09T11:59:34.848+0000] {logging_mixin.py:188} INFO - 
+📊 Récupération depuis https://gamma-api.polymarket.com/events...
+[2026-02-09T11:59:38.136+0000] {logging_mixin.py:188} INFO - ✅ Récupéré 100 événements
+[2026-02-09T11:59:38.137+0000] {logging_mixin.py:188} INFO - 
+📨 Envoi vers Kafka (topic: polymarket-events)...
+[2026-02-09T11:59:38.139+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=1 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T11:59:38.140+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T11:59:38.141+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T11:59:38.149+0000] {cluster.py:318} ERROR - Topic polymarket-events not found in cluster metadata
+[2026-02-09T11:59:38.259+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 10/100 messages
+[2026-02-09T11:59:38.271+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 20/100 messages
+[2026-02-09T11:59:38.282+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 30/100 messages
+[2026-02-09T11:59:38.293+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 40/100 messages
+[2026-02-09T11:59:38.306+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 50/100 messages
+[2026-02-09T11:59:38.320+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 60/100 messages
+[2026-02-09T11:59:38.333+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 70/100 messages
+[2026-02-09T11:59:38.343+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 80/100 messages
+[2026-02-09T11:59:38.352+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 90/100 messages
+[2026-02-09T11:59:38.364+0000] {logging_mixin.py:188} INFO -    ✓ Envoyé : 100/100 messages
+[2026-02-09T11:59:38.429+0000] {kafka.py:633} INFO - <KafkaProducer client_id=kafka-python-producer-1 transactional_id=None>: Closing the Kafka producer with 9223372036.0 secs timeout.
+[2026-02-09T11:59:38.430+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T11:59:38.431+0000] {logging_mixin.py:188} INFO - 
+✅ Tous les messages envoyés à Kafka!
+[2026-02-09T11:59:38.572+0000] {python.py:201} INFO - Done. Returned value was: 100
+[2026-02-09T11:59:38.607+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=polymarket_data_pipeline, task_id=fetch_api_send_kafka, execution_date=20260209T115927, start_date=20260209T115930, end_date=20260209T115938
+[2026-02-09T11:59:38.648+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-02-09T11:59:38.668+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

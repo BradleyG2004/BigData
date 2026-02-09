@@ -10,16 +10,21 @@
                     │  Scheduler  │
                     └──────┬──────┘
                            │
-            ┌──────────────┼──────────────┐
-            │              │              │
-            ▼              ▼              ▼
-      ┌─────────┐    ┌─────────┐   ┌─────────┐
-      │  Task 1 │    │  Task 2 │   │  Task 3 │
-      │ API→Kafka│───▶│Kafka→Mongo──▶│  Spark  │
-      └─────────┘    └─────────┘   └─────────┘
-            │              │              │
-            ▼              ▼              ▼
-      [Kafka Topic]  [MongoDB Atlas]  [Analytics]
+            ┌──────────┼────────────────┐
+            │              │              │   │
+            │              │              │   │
+            │              │              │   │
+            │              │              │   │
+            │              │              │   │
+            ▼              ▼              ▼   ▼
+      ┌─────────┐    ┌─────────┐   ┌─────────┐ ┌─────────┐
+      │  Task 1 │    │  Task 2 │   │  Task 3 │ │  Task 4 │
+      │ API→Kafka│───▶│Kafka→Mongo──▶│Nettoyage─▶│  Spark  │
+      └─────────┘    └─────────┘   └─────────┘ └─────────┘
+            │              │              │        │
+            ▼              ▼              ▼        ▼
+      [Kafka Topic]  [MongoDB Atlas]  [cleaned]  [Analytics]
+                                       collection
                            ▲
                            │
                     [Monitoring MongoDB]
@@ -54,9 +59,33 @@ docker-compose up -d
 2. fetch_api_send_kafka (API → Kafka)
       ↓
 3. consume_kafka_insert_mongo (Kafka → MongoDB)
+      ↓
+4. clean_polymarket_data (🧹 Nettoyage des données)
       ↓  
-4. spark_processing (traitement analytics)
+5. spark_processing (traitement analytics)
 ```
+
+### Détail des Tâches
+
+#### Task 1 : API → Kafka
+- Récupère 100 événements depuis l'API Polymarket
+- Envoie chaque événement dans le topic Kafka `polymarket-events`
+- Log les métriques dans MongoDB monitoring
+
+#### Task 2 : Kafka → MongoDB
+- Consomme les messages du topic Kafka
+- Insère les documents dans la collection `polymarket`
+- Timeout de 30s (mode batch, pas de boucle infinie)
+
+#### Task 3 : Nettoyage 🧹 (NOUVEAU)
+- Filtre les documents (image, icon, seriesSlug, resolutionSource doivent exister)
+- Supprime les champs inutiles (liquidity, archived, volume*, etc.)
+- Insère les documents nettoyés dans la collection `cleaned`
+- Log : nombre de documents source, filtrés, exclus, insérés
+
+#### Task 4 : Spark Processing
+- Traitement analytics (placeholder pour l'instant)
+- À implémenter selon vos besoins
 
 ### Schedule
 

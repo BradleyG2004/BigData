@@ -1,0 +1,60 @@
+[2026-02-09T12:00:10.035+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T11:00:00+00:00 [queued]>
+[2026-02-09T12:00:10.043+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T11:00:00+00:00 [queued]>
+[2026-02-09T12:00:10.044+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2026-02-09T12:00:10.058+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): consume_kafka_insert_mongo> on 2026-02-09 11:00:00+00:00
+[2026-02-09T12:00:10.062+0000] {standard_task_runner.py:60} INFO - Started process 311 to run task
+[2026-02-09T12:00:10.065+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'polymarket_data_pipeline', 'consume_kafka_insert_mongo', 'scheduled__2026-02-09T11:00:00+00:00', '--job-id', '10', '--raw', '--subdir', 'DAGS_FOLDER/polymarket_pipeline_dag.py', '--cfg-path', '/tmp/tmpvzgeibng']
+[2026-02-09T12:00:10.068+0000] {standard_task_runner.py:88} INFO - Job 10: Subtask consume_kafka_insert_mongo
+[2026-02-09T12:00:10.111+0000] {task_command.py:423} INFO - Running <TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T11:00:00+00:00 [running]> on host 68f43ae3703b
+[2026-02-09T12:00:10.175+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='polymarket' AIRFLOW_CTX_DAG_ID='polymarket_data_pipeline' AIRFLOW_CTX_TASK_ID='consume_kafka_insert_mongo' AIRFLOW_CTX_EXECUTION_DATE='2026-02-09T11:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-02-09T11:00:00+00:00'
+[2026-02-09T12:00:10.387+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T12:00:10.388+0000] {logging_mixin.py:188} INFO -   💾 ÉTAPE 2: Kafka → MongoDB
+[2026-02-09T12:00:10.388+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T12:00:13.850+0000] {logging_mixin.py:188} INFO - ✅ Monitoring MongoDB connecté (polymarket_monitoring.pipeline_metrics)
+[2026-02-09T12:00:13.868+0000] {logging_mixin.py:188} INFO - 
+🔄 Connexion à MongoDB...
+[2026-02-09T12:00:14.284+0000] {logging_mixin.py:188} INFO - ✅ Connecté à polymarket_db.polymarket
+[2026-02-09T12:00:14.284+0000] {logging_mixin.py:188} INFO - 
+🔄 Connexion à Kafka (broker:9092)...
+[2026-02-09T12:00:14.286+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T12:00:14.288+0000] {conn.py:622} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <checking_api_versions_recv> [IPv4 ('172.19.0.3', 9092)]>: Broker version identified as 2.6
+[2026-02-09T12:00:14.289+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T12:00:14.290+0000] {subscription_state.py:181} INFO - Updating subscribed topics to: ('polymarket-events',)
+[2026-02-09T12:00:14.290+0000] {logging_mixin.py:188} INFO - ✅ Consumer créé (group: ***-consumer-1770638410)
+[2026-02-09T12:00:14.290+0000] {logging_mixin.py:188} INFO - 
+📨 Consommation des messages...
+[2026-02-09T12:00:14.294+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T12:00:14.294+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T12:00:14.295+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:14.399+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638410 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T12:00:14.401+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638410
+[2026-02-09T12:00:14.402+0000] {base.py:895} INFO - Starting new heartbeat thread
+[2026-02-09T12:00:14.404+0000] {consumer.py:379} INFO - Revoking previously assigned partitions () for group ***-consumer-1770638410
+[2026-02-09T12:00:14.405+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638410: NodeNotReadyError: coordinator-1
+[2026-02-09T12:00:14.407+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T12:00:14.408+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T12:00:14.509+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638410
+[2026-02-09T12:00:14.519+0000] {base.py:661} INFO - Received member id kafka-python-2.3.0-8c0e0c51-dbf5-4a12-b260-3a6e97ee6192 for group ***-consumer-1770638410; will retry join-group
+[2026-02-09T12:00:14.520+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638410: [Error 79] MemberIdRequiredError
+[2026-02-09T12:00:14.521+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638410
+[2026-02-09T12:00:14.524+0000] {base.py:617} INFO - Successfully joined group ***-consumer-1770638410 <Generation 1 (member_id: kafka-python-2.3.0-8c0e0c51-dbf5-4a12-b260-3a6e97ee6192, protocol: range)>
+[2026-02-09T12:00:14.524+0000] {base.py:619} INFO - Elected group leader -- performing partition assignments using range
+[2026-02-09T12:00:14.533+0000] {subscription_state.py:254} INFO - Updated partition assignment: [('polymarket-events', 0), ('polymarket-events', 1), ('polymarket-events', 2)]
+[2026-02-09T12:00:14.534+0000] {consumer.py:260} INFO - Setting newly assigned partitions (('polymarket-events', 0), ('polymarket-events', 1), ('polymarket-events', 2)) for group ***-consumer-1770638410
+[2026-02-09T12:00:14.538+0000] {fetcher.py:418} INFO - Resetting offset for partition ('polymarket-events', 2) to offset 0.
+[2026-02-09T12:00:14.539+0000] {fetcher.py:418} INFO - Resetting offset for partition ('polymarket-events', 0) to offset 0.
+[2026-02-09T12:00:14.539+0000] {fetcher.py:418} INFO - Resetting offset for partition ('polymarket-events', 1) to offset 0.
+[2026-02-09T12:00:16.287+0000] {logging_mixin.py:188} INFO -    ✓ Inséré batch de 100 documents (1353ms)
+[2026-02-09T12:00:17.282+0000] {logging_mixin.py:188} INFO -    ✓ Inséré batch de 100 documents (965ms)
+[2026-02-09T12:00:18.282+0000] {logging_mixin.py:188} INFO -    ✓ Inséré batch de 100 documents (978ms)
+[2026-02-09T12:00:48.325+0000] {logging_mixin.py:188} INFO - 
+✅ Total inséré dans MongoDB: 300 documents
+[2026-02-09T12:00:48.616+0000] {base.py:1130} INFO - Stopping heartbeat thread
+[2026-02-09T12:00:48.617+0000] {base.py:943} INFO - Leaving consumer group ***-consumer-1770638410 (member kafka-python-2.3.0-8c0e0c51-dbf5-4a12-b260-3a6e97ee6192).
+[2026-02-09T12:00:48.626+0000] {base.py:961} INFO - LeaveGroup request for group ***-consumer-1770638410 returned successfully
+[2026-02-09T12:00:48.627+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:48.628+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:48.637+0000] {python.py:201} INFO - Done. Returned value was: 300
+[2026-02-09T12:00:48.671+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=polymarket_data_pipeline, task_id=consume_kafka_insert_mongo, execution_date=20260209T110000, start_date=20260209T120010, end_date=20260209T120048
+[2026-02-09T12:00:48.721+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-02-09T12:00:48.744+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

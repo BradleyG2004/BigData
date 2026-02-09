@@ -221,14 +221,124 @@ def consume_kafka_and_insert_mongo():
         raise
 
 
+def clean_polymarket_data_task():
+    """
+    Étape 3 : Nettoyage des données Polymarket
+    Filtre et nettoie les données insérées dans MongoDB
+    """
+    from pymongo import MongoClient
+    from monitoring_mongo import get_monitoring_service
+    
+    print("=" * 60)
+    print("  🧹 ÉTAPE 3: Nettoyage des données")
+    print("=" * 60)
+    
+    # Configuration
+    mongo_uri = os.getenv('MONGO_URI')
+    db_name = os.getenv('DB2', 'polymarket_db')
+    
+    # Monitoring
+    monitoring = get_monitoring_service()
+    run_id = monitoring.log_pipeline_start('cleaning', {'source': 'airflow'})
+    
+    try:
+        # Connexion MongoDB
+        print(f"\n🔄 Connexion à MongoDB ({db_name})...")
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        db = client[db_name]
+        source_collection = db['polymarket']
+        target_collection = db['cleaned']
+        
+        # Compter les documents source
+        total_docs = source_collection.count_documents({})
+        print(f"✅ Documents dans 'polymarket': {total_docs}")
+        
+        # Vérifier si la collection cible existe déjà
+        existing_count = target_collection.count_documents({})
+        if existing_count > 0:
+            print(f"⚠️  Collection 'cleaned' contient déjà {existing_count} documents")
+            target_collection.delete_many({})
+            print("   ✓ Données existantes supprimées")
+        
+        # Champs à supprimer
+        fields_to_remove = [
+            'liquidity', 'archived', 'new', 'featured', 'restricted', 'sortBy',
+            'competitive', 'volume24hr', 'volume1wk', 'volume1mo', 'volume1yr',
+            'liquidityAmm', 'LiquidityAmm', 'liquidityClob', 'cyom', 'showAllOutcomes',
+            'openInterest', 'markets', 'series', 'tags', 'enableNegRisk',
+            'negRiskAugmented', 'pendingDeployment', 'deploying', 'requiresTranslation',
+            'commentsEnabled', 'subcategory', 'closed', 'active', 'showMarketImages'
+        ]
+        
+        # Critères de filtrage
+        filter_query = {
+            'image': {'$exists': True, '$ne': ''},
+            'icon': {'$exists': True, '$ne': ''},
+            'seriesSlug': {'$exists': True, '$ne': ''},
+            'resolutionSource': {'$exists': True, '$ne': ''}
+        }
+        
+        print(f"\n🔍 Filtrage des documents...")
+        filtered_docs = list(source_collection.find(filter_query))
+        filtered_count = len(filtered_docs)
+        
+        print(f"   ✓ Trouvé {filtered_count} documents valides")
+        print(f"   ✗ Exclu {total_docs - filtered_count} documents")
+        
+        if filtered_count == 0:
+            print("\n⚠️  Aucun document ne correspond aux critères")
+            monitoring.log_pipeline_end(run_id, 'success', 0, 'No documents to clean')
+            return 0
+        
+        # Nettoyer les documents
+        print(f"\n🧹 Nettoyage de {filtered_count} documents...")
+        cleaned_docs = []
+        for doc in filtered_docs:
+            for field in fields_to_remove:
+                doc.pop(field, None)
+            cleaned_docs.append(doc)
+        
+        # Insérer dans la collection cible
+        print(f"\n💾 Insertion dans '{db_name}.cleaned'...")
+        batch_size = 1000
+        total_inserted = 0
+        
+        for i in range(0, len(cleaned_docs), batch_size):
+            batch = cleaned_docs[i:i + batch_size]
+            result = target_collection.insert_many(batch)
+            total_inserted += len(result.inserted_ids)
+            print(f"   ✓ Batch {i//batch_size + 1}: {total_inserted}/{len(cleaned_docs)}")
+        
+        print(f"\n✅ {total_inserted} documents nettoyés et insérés!")
+        print(f"\n📊 Résumé:")
+        print(f"   - Documents source: {total_docs}")
+        print(f"   - Filtrés: {filtered_count}")
+        print(f"   - Exclus: {total_docs - filtered_count}")
+        print(f"   - Insérés: {total_inserted}")
+        
+        client.close()
+        
+        # Monitoring
+        monitoring.log_pipeline_end(run_id, 'success', total_inserted)
+        monitoring.log_batch_insert('cleaning', total_inserted, 0)
+        
+        return total_inserted
+        
+    except Exception as e:
+        print(f"\n❌ Erreur lors du nettoyage: {e}")
+        monitoring.log_pipeline_end(run_id, 'failed', 0, str(e))
+        monitoring.log_error('cleaning', str(e))
+        raise
+
+
 def process_with_spark():
     """
-    Étape 3 : Traitement avec Spark
+    Étape 4 : Traitement avec Spark
     """
     from monitoring_mongo import get_monitoring_service
     
     print("=" * 60)
-    print("  🔥 ÉTAPE 3: Traitement Spark")
+    print("  🔥 ÉTAPE 4: Traitement Spark")
     print("=" * 60)
     
     monitoring = get_monitoring_service()
@@ -276,7 +386,14 @@ consume_and_insert = PythonOperator(
     dag=dag,
 )
 
-# Task 3: Traitement Spark (optionnel)
+# Task 3: Nettoyer les données Polymarket
+clean_data = PythonOperator(
+    task_id='clean_polymarket_data',
+    python_callable=clean_polymarket_data_task,
+    dag=dag,
+)
+
+# Task 4: Traitement Spark (optionnel)
 spark_processing = PythonOperator(
     task_id='spark_processing',
     python_callable=process_with_spark,
@@ -287,4 +404,4 @@ spark_processing = PythonOperator(
 # Définition du flux d'exécution
 # ================================
 
-check_kafka >> fetch_and_send >> consume_and_insert >> spark_processing
+check_kafka >> fetch_and_send >> consume_and_insert >> clean_data >> spark_processing

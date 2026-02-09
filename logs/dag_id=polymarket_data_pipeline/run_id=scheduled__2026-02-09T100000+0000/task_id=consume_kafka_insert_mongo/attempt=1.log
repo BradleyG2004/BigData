@@ -1,0 +1,100 @@
+[2026-02-09T11:59:39.518+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T10:00:00+00:00 [queued]>
+[2026-02-09T11:59:39.526+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T10:00:00+00:00 [queued]>
+[2026-02-09T11:59:39.527+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2026-02-09T11:59:39.542+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): consume_kafka_insert_mongo> on 2026-02-09 10:00:00+00:00
+[2026-02-09T11:59:39.546+0000] {standard_task_runner.py:60} INFO - Started process 254 to run task
+[2026-02-09T11:59:39.548+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'polymarket_data_pipeline', 'consume_kafka_insert_mongo', 'scheduled__2026-02-09T10:00:00+00:00', '--job-id', '6', '--raw', '--subdir', 'DAGS_FOLDER/polymarket_pipeline_dag.py', '--cfg-path', '/tmp/tmpfoijhlfe']
+[2026-02-09T11:59:39.551+0000] {standard_task_runner.py:88} INFO - Job 6: Subtask consume_kafka_insert_mongo
+[2026-02-09T11:59:39.602+0000] {task_command.py:423} INFO - Running <TaskInstance: polymarket_data_pipeline.consume_kafka_insert_mongo scheduled__2026-02-09T10:00:00+00:00 [running]> on host 68f43ae3703b
+[2026-02-09T11:59:39.669+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='polymarket' AIRFLOW_CTX_DAG_ID='polymarket_data_pipeline' AIRFLOW_CTX_TASK_ID='consume_kafka_insert_mongo' AIRFLOW_CTX_EXECUTION_DATE='2026-02-09T10:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-02-09T10:00:00+00:00'
+[2026-02-09T11:59:39.846+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T11:59:39.846+0000] {logging_mixin.py:188} INFO -   💾 ÉTAPE 2: Kafka → MongoDB
+[2026-02-09T11:59:39.846+0000] {logging_mixin.py:188} INFO - ============================================================
+[2026-02-09T11:59:43.234+0000] {logging_mixin.py:188} INFO - ✅ Monitoring MongoDB connecté (polymarket_monitoring.pipeline_metrics)
+[2026-02-09T11:59:43.316+0000] {logging_mixin.py:188} INFO - 
+🔄 Connexion à MongoDB...
+[2026-02-09T11:59:43.742+0000] {logging_mixin.py:188} INFO - ✅ Connecté à polymarket_db.polymarket
+[2026-02-09T11:59:43.742+0000] {logging_mixin.py:188} INFO - 
+🔄 Connexion à Kafka (broker:9092)...
+[2026-02-09T11:59:43.744+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T11:59:43.748+0000] {conn.py:622} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <checking_api_versions_recv> [IPv4 ('172.19.0.3', 9092)]>: Broker version identified as 2.6
+[2026-02-09T11:59:43.749+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T11:59:43.750+0000] {subscription_state.py:181} INFO - Updating subscribed topics to: ('polymarket-events',)
+[2026-02-09T11:59:43.751+0000] {logging_mixin.py:188} INFO - ✅ Consumer créé (group: ***-consumer-1770638379)
+[2026-02-09T11:59:43.752+0000] {logging_mixin.py:188} INFO - 
+📨 Consommation des messages...
+[2026-02-09T11:59:43.755+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T11:59:43.756+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T11:59:43.757+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T11:59:43.966+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:43.967+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:43.967+0000] {base.py:895} INFO - Starting new heartbeat thread
+[2026-02-09T11:59:43.968+0000] {consumer.py:379} INFO - Revoking previously assigned partitions () for group ***-consumer-1770638379
+[2026-02-09T11:59:43.969+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: NodeNotReadyError: coordinator-1
+[2026-02-09T11:59:43.970+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T11:59:43.971+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T11:59:44.072+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.079+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.080+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.081+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.184+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.185+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.186+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.188+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.193+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.194+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.302+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.305+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.307+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.318+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.319+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.320+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.423+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.424+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.425+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.428+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.429+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.429+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.532+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.533+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.533+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.536+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.537+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.537+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.640+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.641+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.642+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.645+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.646+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.647+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.749+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.750+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.751+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.753+0000] {base.py:857} WARNING - Marking the coordinator dead (node coordinator-1) for group ***-consumer-1770638379: [Error 16] NotCoordinatorError.
+[2026-02-09T11:59:44.754+0000] {base.py:641} INFO - Attempt to join group ***-consumer-1770638379 failed due to obsolete coordinator information: NotCoordinatorError
+[2026-02-09T11:59:44.754+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 16] NotCoordinatorError
+[2026-02-09T11:59:44.857+0000] {cluster.py:403} INFO - Coordinator for group/***-consumer-1770638379 is ('coordinator-1', 'broker', 9092, None)
+[2026-02-09T11:59:44.858+0000] {base.py:835} INFO - Discovered coordinator coordinator-1 for group ***-consumer-1770638379
+[2026-02-09T11:59:44.859+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.896+0000] {base.py:661} INFO - Received member id kafka-python-2.3.0-3c2f0ce2-0496-408e-bcec-45c06dff73b3 for group ***-consumer-1770638379; will retry join-group
+[2026-02-09T11:59:44.896+0000] {base.py:433} INFO - Failed to join group ***-consumer-1770638379: [Error 79] MemberIdRequiredError
+[2026-02-09T11:59:44.897+0000] {base.py:546} INFO - (Re-)joining group ***-consumer-1770638379
+[2026-02-09T11:59:44.913+0000] {base.py:617} INFO - Successfully joined group ***-consumer-1770638379 <Generation 2 (member_id: kafka-python-2.3.0-3c2f0ce2-0496-408e-bcec-45c06dff73b3, protocol: range)>
+[2026-02-09T11:59:44.924+0000] {subscription_state.py:254} INFO - Updated partition assignment: [('polymarket-events', 0), ('polymarket-events', 1)]
+[2026-02-09T11:59:44.925+0000] {consumer.py:260} INFO - Setting newly assigned partitions (('polymarket-events', 0), ('polymarket-events', 1)) for group ***-consumer-1770638379
+[2026-02-09T11:59:44.948+0000] {fetcher.py:418} INFO - Resetting offset for partition ('polymarket-events', 0) to offset 0.
+[2026-02-09T11:59:44.948+0000] {fetcher.py:418} INFO - Resetting offset for partition ('polymarket-events', 1) to offset 0.
+[2026-02-09T11:59:46.546+0000] {logging_mixin.py:188} INFO -    ✓ Inséré batch de 100 documents (1228ms)
+[2026-02-09T12:00:10.439+0000] {logging_mixin.py:188} INFO -    ✓ Inséré batch de 100 documents (1146ms)
+[2026-02-09T12:00:40.983+0000] {logging_mixin.py:188} INFO -    ✓ Inséré dernier batch de 5 documents
+[2026-02-09T12:00:40.985+0000] {logging_mixin.py:188} INFO - 
+✅ Total inséré dans MongoDB: 205 documents
+[2026-02-09T12:00:41.375+0000] {base.py:1130} INFO - Stopping heartbeat thread
+[2026-02-09T12:00:41.376+0000] {base.py:943} INFO - Leaving consumer group ***-consumer-1770638379 (member kafka-python-2.3.0-3c2f0ce2-0496-408e-bcec-45c06dff73b3).
+[2026-02-09T12:00:41.384+0000] {base.py:961} INFO - LeaveGroup request for group ***-consumer-1770638379 returned successfully
+[2026-02-09T12:00:41.385+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:41.386+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-2.3.0, node_id=coordinator-1 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:41.820+0000] {python.py:201} INFO - Done. Returned value was: 205
+[2026-02-09T12:00:41.843+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=polymarket_data_pipeline, task_id=consume_kafka_insert_mongo, execution_date=20260209T100000, start_date=20260209T115939, end_date=20260209T120041
+[2026-02-09T12:00:41.875+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-02-09T12:00:41.896+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

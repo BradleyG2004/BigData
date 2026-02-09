@@ -1,0 +1,20 @@
+[2026-02-09T12:00:01.055+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: polymarket_data_pipeline.check_kafka_ready scheduled__2026-02-09T11:00:00+00:00 [queued]>
+[2026-02-09T12:00:01.064+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: polymarket_data_pipeline.check_kafka_ready scheduled__2026-02-09T11:00:00+00:00 [queued]>
+[2026-02-09T12:00:01.065+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2026-02-09T12:00:01.085+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonSensor): check_kafka_ready> on 2026-02-09 11:00:00+00:00
+[2026-02-09T12:00:01.091+0000] {standard_task_runner.py:60} INFO - Started process 292 to run task
+[2026-02-09T12:00:01.096+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'polymarket_data_pipeline', 'check_kafka_ready', 'scheduled__2026-02-09T11:00:00+00:00', '--job-id', '8', '--raw', '--subdir', 'DAGS_FOLDER/polymarket_pipeline_dag.py', '--cfg-path', '/tmp/tmpeih45ij4']
+[2026-02-09T12:00:01.107+0000] {standard_task_runner.py:88} INFO - Job 8: Subtask check_kafka_ready
+[2026-02-09T12:00:01.292+0000] {task_command.py:423} INFO - Running <TaskInstance: polymarket_data_pipeline.check_kafka_ready scheduled__2026-02-09T11:00:00+00:00 [running]> on host 68f43ae3703b
+[2026-02-09T12:00:01.428+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='polymarket' AIRFLOW_CTX_DAG_ID='polymarket_data_pipeline' AIRFLOW_CTX_TASK_ID='check_kafka_ready' AIRFLOW_CTX_EXECUTION_DATE='2026-02-09T11:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-02-09T11:00:00+00:00'
+[2026-02-09T12:00:01.433+0000] {python.py:75} INFO - Poking callable: <function check_kafka_available at 0x7f8f9b29fe20>
+[2026-02-09T12:00:01.713+0000] {conn.py:400} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connecting> [IPv4 ('172.19.0.3', 9092)]>: connecting to broker:9092 [('172.19.0.3', 9092) IPv4]
+[2026-02-09T12:00:01.716+0000] {conn.py:622} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <checking_api_versions_recv> [IPv4 ('172.19.0.3', 9092)]>: Broker version identified as 2.6
+[2026-02-09T12:00:01.717+0000] {conn.py:461} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Connection complete.
+[2026-02-09T12:00:01.720+0000] {kafka.py:633} INFO - <KafkaProducer client_id=kafka-python-producer-1 transactional_id=None>: Closing the Kafka producer with 9223372036.0 secs timeout.
+[2026-02-09T12:00:01.722+0000] {conn.py:951} INFO - <BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-0 host=broker:9092 <connected> [IPv4 ('172.19.0.3', 9092)]>: Closing connection. 
+[2026-02-09T12:00:01.723+0000] {logging_mixin.py:188} INFO - ✅ Kafka est disponible sur broker:9092
+[2026-02-09T12:00:01.723+0000] {base.py:295} INFO - Success criteria met. Exiting.
+[2026-02-09T12:00:01.732+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=polymarket_data_pipeline, task_id=check_kafka_ready, execution_date=20260209T110000, start_date=20260209T120001, end_date=20260209T120001
+[2026-02-09T12:00:01.751+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-02-09T12:00:01.779+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
