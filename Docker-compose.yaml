@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # ================================
+  # 🧩 Service Kafka (broker KRaft)
+  # ================================
+  broker:
+    image: apache/kafka:latest
+    container_name: broker
+
+    # ✅ Expose les ports sur ta machine hôte (Windows)
+    # - 9092 : port utilisé par les clients (ton script Python producteur/consommateur)
+    # - 9093 : port interne pour le contrôleur KRaft (pas utilisé directement par ton script)
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+
+    environment:
+      # Identifiant unique du nœud Kafka dans le cluster (ici un seul nœud)
+      KAFKA_NODE_ID: 1
+
+      # Rôles joués par ce nœud (broker + controller en mode KRaft, sans Zookeeper)
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # Listeners :
+      # - 0.0.0.0 pour écouter sur toutes les interfaces dans le conteneur
+      #   => permet d’accéder à Kafka depuis ta machine via localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+
+      # Adresse "annoncée" aux clients.
+      # - Pour un script qui tourne directement sur ta machine : localhost:9092
+      # - Si tu veux qu’un autre conteneur se connecte, tu peux mettre : PLAINTEXT://broker:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+
+      # Nom du listener utilisé par le contrôleur KRaft
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # Mapping des protocoles de sécurité pour chaque listener (tout en PLAINTEXT ici)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      # Configuration du quorum KRaft (ici un seul contrôleur, ID=1, hostname=broker)
+      # Si tu changes le nom du service, mets le même ici (ex : 1@mon-broker:9093)
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+
+      # Facteurs de réplication à 1 car on est en single-node
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      # Paramètres "confort" pour les consommateurs
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+
+    # 💡 Optionnel : si tu veux persister les données Kafka sur ton disque,
+    # décommente les volumes ci-dessous et adapte le chemin.
+    # volumes:
+    #   - ./kafka-data:/var/lib/kafka/data

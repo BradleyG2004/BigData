@@ -1,0 +1,7 @@
+# Dépendances pour le Producer (API → Kafka)
+requests==2.31.0
+kafka-python==2.0.2
+python-dotenv==1.0.0
+
+# Dépendances pour le Consumer (Kafka → MongoDB)
+pymongo==4.6.1
