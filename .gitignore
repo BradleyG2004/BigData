@@ -1,1 +1,3 @@
 .env
+logs\scheduler\2026-02-09\polymarket_pipeline_dag.py.log
+logs\dag_processor_manager\dag_processor_manager.log
