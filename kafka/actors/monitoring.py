@@ -50,21 +50,22 @@ class MonitoringService:
             if error_message:
                 print(f"   Error: {error_message}")
     
-    def log_kafka_metrics(self, topic, partition, offset, messages_count, consumer_group=None):
+    def log_kafka_metrics(self, topic, messages_count, partition=None, offset=None, consumer_group=None):
         """
         Log les métriques Kafka
         
         Args:
             topic: Nom du topic
-            partition: Numéro de partition
-            offset: Offset actuel
             messages_count: Nombre de messages
-            consumer_group: Groupe de consommateurs
+            partition: Numéro de partition (optionnel)
+            offset: Offset actuel (optionnel)
+            consumer_group: Groupe de consommateurs (optionnel)
         """
         if self.enabled:
             print(f"📊 [MONITORING] Kafka metrics:")
-            print(f"   Topic: {topic}, Partition: {partition}, Offset: {offset}")
-            print(f"   Messages: {messages_count}")
+            print(f"   Topic: {topic}, Messages: {messages_count}")
+            if partition is not None:
+                print(f"   Partition: {partition}, Offset: {offset}")
             if consumer_group:
                 print(f"   Consumer group: {consumer_group}")
     
