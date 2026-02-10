@@ -195,7 +195,8 @@ def write_to_console(df, query_name="console_output"):
 def write_to_postgresql(df):
     """
     Écrit les données nettoyées directement dans PostgreSQL 'polymarket_cleaned'
-    Utilise le mode JDBC streaming avec foreachBatch
+    Utilise UPSERT (ON CONFLICT DO UPDATE) pour éviter les doublons sur mongo_id
+    Même logique que consumer.py pour MongoDB (ReplaceOne avec upsert=True)
     """
     jdbc_url = f"jdbc:postgresql://{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     
@@ -205,22 +206,82 @@ def write_to_postgresql(df):
             return
         
         try:
-            # Écrire directement dans PostgreSQL
-            batch_df.write \
-                .format("jdbc") \
-                .option("url", jdbc_url) \
-                .option("dbtable", "polymarket_cleaned") \
-                .option("user", POSTGRES_USER) \
-                .option("password", POSTGRES_PASSWORD) \
-                .option("driver", "org.postgresql.Driver") \
-                .mode("append") \
-                .save()
+            import psycopg2
+            from psycopg2.extras import execute_values
             
-            count = batch_df.count()
-            print(f"   ✓ Batch {batch_id}: {count} documents insérés dans PostgreSQL")
+            # Convertir Spark DataFrame en liste de tuples
+            rows = batch_df.collect()
+            
+            # Connexion PostgreSQL
+            conn = psycopg2.connect(
+                host=POSTGRES_HOST,
+                port=int(POSTGRES_PORT),
+                database=POSTGRES_DB,
+                user=POSTGRES_USER,
+                password=POSTGRES_PASSWORD
+            )
+            cursor = conn.cursor()
+            
+            # Préparer les données pour insertion
+            data = []
+            for row in rows:
+                data.append((
+                    row.mongo_id,
+                    row.condition_id,
+                    row.question_id,
+                    row.slug,
+                    row.title,
+                    row.description,
+                    row.question,
+                    row.category,
+                    row.series_slug,
+                    row.resolution_source,
+                    row.image,
+                    row.icon,
+                    row.resolution_title,
+                    row.question_type,
+                    row.outcomes,
+                    row.outcome_prices,
+                    row.volume,
+                    row.volume_num,
+                    row.start_date,
+                    row.end_date,
+                    row.game_start_datetime,
+                    row.seconds_delay,
+                    row.seconds_since_start
+                ))
+            
+            # UPSERT: INSERT ... ON CONFLICT DO UPDATE (même logique que MongoDB ReplaceOne)
+            upsert_query = """
+            INSERT INTO polymarket_cleaned (
+                mongo_id, condition_id, question_id, slug, title, description, question,
+                category, series_slug, resolution_source, image, icon,
+                resolution_title, question_type, outcomes, outcome_prices,
+                volume, volume_num, start_date, end_date, game_start_datetime,
+                seconds_delay, seconds_since_start
+            ) VALUES %s
+            ON CONFLICT (mongo_id) DO UPDATE SET
+                title = EXCLUDED.title,
+                description = EXCLUDED.description,
+                volume = EXCLUDED.volume,
+                volume_num = EXCLUDED.volume_num,
+                outcome_prices = EXCLUDED.outcome_prices,
+                updated_at = NOW()
+            """
+            
+            execute_values(cursor, upsert_query, data, page_size=100)
+            conn.commit()
+            
+            inserted_count = len(data)
+            cursor.close()
+            conn.close()
+            
+            print(f"   ✓ Batch {batch_id}: {inserted_count} documents traités (insérés/mis à jour)")
             
         except Exception as e:
             print(f"   ❌ Batch {batch_id} erreur: {e}")
+            import traceback
+            traceback.print_exc()
     
     query = df \
         .writeStream \
