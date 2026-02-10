@@ -7,9 +7,6 @@ from kafka import KafkaProducer
 from dotenv import load_dotenv
 from monitoring import get_monitoring_service
 
-# ⚠️ Assure-toi d'avoir installé les dépendances côté Python :
-#   pip install requests kafka-python python-dotenv psycopg2-binary
-
 # Load environment variables
 load_dotenv()
 
