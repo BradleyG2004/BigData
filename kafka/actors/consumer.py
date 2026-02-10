@@ -104,7 +104,9 @@ def create_kafka_consumer():
             value_deserializer=lambda m: json.loads(m.decode('utf-8')),
             # Commit automatique des offsets
             enable_auto_commit=True,
-            auto_commit_interval_ms=1000
+            auto_commit_interval_ms=1000,
+            # Timeout: arrêter après 30s sans nouveaux messages (mode batch pour DAG)
+            consumer_timeout_ms=30000  # 30 secondes d'inactivité = arrêt
         )
 
         print("✅ Consommateur Kafka créé avec succès !")
@@ -207,15 +209,28 @@ def consume_and_insert(consumer, collection, run_id=None):
                 # Log métriques Kafka
                 monitoring.log_kafka_metrics(
                     topic=KAFKA_TOPIC,
+                    messages_count=message_count,
                     partition=message.partition,
                     offset=message.offset,
-                    messages_count=message_count,
                     consumer_group=KAFKA_GROUP_ID
                 )
                 
                 batch = []
                 message_count = 0
                 print(f"   📊 Total inséré jusqu'à maintenant : {total_inserted} documents\n")
+    
+    except StopIteration:
+        # Timeout atteint (30s sans nouveaux messages) - comportement normal
+        print("\n⏱️  Timeout atteint : plus de messages disponibles")
+        
+        # Insérer le dernier batch s'il n'est pas vide
+        if batch:
+            print(f"\n💾 Insertion du dernier batch ({len(batch)} documents)...")
+            inserted = insert_batch_to_mongodb(collection, batch)
+            total_inserted += inserted
+        
+        print(f"\n✅ Total de documents traités : {total_inserted}")
+        print("🛑 Arrêt du consommateur...")
     
     except KeyboardInterrupt:
         print("\n\n⚠️  Interruption par l'utilisateur...")
