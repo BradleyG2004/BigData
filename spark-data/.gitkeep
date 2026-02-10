@@ -1,0 +1,2 @@
+# Ce fichier préserve la structure du dossier spark-data dans Git
+# Le répertoire checkpoint/ sera créé automatiquement par Spark

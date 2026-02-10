@@ -1,2 +1,15 @@
 .env
 logs/
+
+# Spark checkpoint (généré à l'exécution)
+spark-data/checkpoint/
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Fichiers temporaires
+*.log
+.DS_Store
+Thumbs.db
