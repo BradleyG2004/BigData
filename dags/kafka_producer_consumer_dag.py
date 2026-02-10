@@ -35,35 +35,35 @@ default_args = {
 def check_kafka_availability():
     """
     Vérifie que Kafka est disponible et prêt à recevoir des messages.
+    Utilise kafka-python au lieu d'une commande shell.
     """
+    from kafka import KafkaProducer
+    
     print("🔍 Vérification de la disponibilité de Kafka...")
     
-    kafka_broker = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092')
+    # Configuration correcte du broker (broker:9092 pour communication interne Docker)
+    kafka_broker = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'broker:9092')
     max_retries = 10
     retry_interval = 5
     
     for attempt in range(1, max_retries + 1):
         try:
-            print(f"Tentative {attempt}/{max_retries}...")
+            print(f"Tentative {attempt}/{max_retries} - Connexion à {kafka_broker}...")
             
-            # Utilise kafka-broker-api-versions pour tester la connexion
-            result = subprocess.run(
-                ['kafka-broker-api-versions', '--bootstrap-server', kafka_broker],
-                capture_output=True,
-                text=True,
-                timeout=10
+            # Utilise KafkaProducer pour tester la connexion
+            producer = KafkaProducer(
+                bootstrap_servers=kafka_broker,
+                request_timeout_ms=5000,
+                api_version_auto_timeout_ms=5000
             )
             
-            if result.returncode == 0:
-                print("✅ Kafka est disponible et opérationnel")
-                return True
-            else:
-                print(f"⚠️ Kafka pas encore prêt: {result.stderr}")
+            # Si on arrive ici, la connexion est réussie
+            producer.close()
+            print("✅ Kafka est disponible et opérationnel")
+            return True
                 
-        except subprocess.TimeoutExpired:
-            print(f"⏱️ Timeout lors de la tentative {attempt}")
         except Exception as e:
-            print(f"❌ Erreur lors de la vérification: {e}")
+            print(f"❌ Erreur lors de la tentative {attempt}: {str(e)}")
         
         if attempt < max_retries:
             print(f"⏳ Attente de {retry_interval}s avant nouvelle tentative...")
@@ -81,12 +81,12 @@ def run_kafka_producer():
     print("🚀 DÉMARRAGE DU PRODUCER KAFKA")
     print("="*70)
     print(f"📅 Timestamp: {datetime.now()}")
-    print(f"🔗 Kafka Broker: {os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092')}")
+    print(f"🔗 Kafka Broker: {os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'broker:9092')}")
     print(f"📝 Topic: {os.getenv('KAFKA_TOPIC', 'polymarket-events')}")
     print("="*70)
     
     # Chemin vers le script producer
-    producer_script = '/opt/airflow/producer.py'
+    producer_script = '/opt/airflow/project/kafka/actors/producer.py'
     
     if not os.path.exists(producer_script):
         raise FileNotFoundError(f"❌ Script producer introuvable: {producer_script}")
@@ -100,7 +100,7 @@ def run_kafka_producer():
             capture_output=True,
             text=True,
             timeout=600,  # 10 minutes max
-            cwd='/opt/airflow'
+            cwd='/opt/airflow/project/kafka/actors'
         )
         
         print("\n" + "="*70)
@@ -136,13 +136,13 @@ def run_kafka_consumer():
     print("🚀 DÉMARRAGE DU CONSUMER KAFKA")
     print("="*70)
     print(f"📅 Timestamp: {datetime.now()}")
-    print(f"🔗 Kafka Broker: {os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092')}")
+    print(f"🔗 Kafka Broker: {os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'broker:9092')}")
     print(f"📝 Topic: {os.getenv('KAFKA_TOPIC', 'polymarket-events')}")
     print(f"💾 MongoDB: {os.getenv('MONGO_DB', 'polymarket')}")
     print("="*70)
     
     # Chemin vers le script consumer
-    consumer_script = '/opt/airflow/consumer.py'
+    consumer_script = '/opt/airflow/project/kafka/actors/consumer.py'
     
     if not os.path.exists(consumer_script):
         raise FileNotFoundError(f"❌ Script consumer introuvable: {consumer_script}")
@@ -156,7 +156,7 @@ def run_kafka_consumer():
             capture_output=True,
             text=True,
             timeout=600,  # 10 minutes max
-            cwd='/opt/airflow'
+            cwd='/opt/airflow/project/kafka/actors'
         )
         
         print("\n" + "="*70)
