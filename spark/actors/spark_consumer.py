@@ -107,6 +107,7 @@ def read_from_kafka(spark):
         .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP_SERVERS) \
         .option("subscribe", KAFKA_TOPIC) \
         .option("startingOffsets", "earliest") \
+        .option("failOnDataLoss", "false") \
         .load()
     
     print("✅ Connexion Kafka établie!")
