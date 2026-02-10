@@ -235,6 +235,39 @@ services:
     restart: always
 
   # ================================
+  # ⚡ Spark Consumer - Kafka → PostgreSQL (Streaming en continu)
+  # ================================
+  spark-consumer:
+    image: spark-polymarket:latest
+    container_name: spark-consumer
+    depends_on:
+      - spark-master
+      - broker
+      - postgres-polymarket
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      KAFKA_TOPIC: polymarket-events
+      POSTGRES_HOST: postgres-polymarket
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: polymarket
+      POSTGRES_USER: polymarket
+      POSTGRES_PASSWORD: polymarket123
+    volumes:
+      - ./spark-apps:/opt/spark/jobs
+      - ./spark-data:/opt/spark/data
+    command: >
+      sh -c "
+      mkdir -p /tmp/.ivy2 &&
+      sleep 10 &&
+      /opt/spark/bin/spark-submit
+      --master spark://spark-master:7077
+      --conf spark.jars.ivy=/tmp/.ivy2
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.1,org.postgresql:postgresql:42.7.1
+      /opt/spark/jobs/spark_consumer.py
+      "
+    restart: unless-stopped
+
+  # ================================
   # 📊 Grafana - Visualisation et comparaison des données
   # ================================
   # Service de collecte des statistiques MongoDB pour Grafana
