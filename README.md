@@ -4,25 +4,37 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         POLYMARKET PIPELINE                         │
+│                    POLYMARKET PIPELINE v2.0                         │
+│              Spark Streaming pour le nettoyage temps réel          │
 └─────────────────────────────────────────────────────────────────────┘
 
-📡 API Polymarket
-    ↓
-🔥 Kafka (Topic: polymarket-events)
-    ↓
-🗄️ MongoDB (Collection: polymarket) [RAW DATA]
-    ↓
-🧹 Cleaning Process
-    ↓
-🗄️ MongoDB (Collection: cleaned) [CLEANED DATA]
-    ↓
-🗄️ PostgreSQL (Table: polymarket_cleaned) [STRUCTURED DATA]
-    ↓
-📊 Grafana Dashboards [VISUALIZATION & COMPARISON]
-    ↑
-🔥 Spark Processing (Analysis)
+                    📡 API Polymarket
+                           ↓
+                    🚀 Producer.py
+                           ↓
+              🔥 Kafka (polymarket-events)
+                      ↙        ↘
+                     ↙          ↘
+         [RAW PATH]              [CLEANED PATH]
+              ↓                       ↓
+    👨‍💻 Consumer.py          ⚡ Spark Consumer
+              ↓                  (Filtrage + Nettoyage)
+    🗄️ MongoDB                        ↓
+    polymarket.polymarket    🗄️ PostgreSQL
+    [RAW DATA]              polymarket_cleaned
+         ↓                    [CLEANED DATA]
+         ↓                         ↓
+         └─────────→ 📊 Grafana ←──┘
+                  [COMPARISON]
 ```
+
+### 🔑 Points Clés de l'Architecture
+
+- **2 chemins parallèles** depuis Kafka
+- **MongoDB**: Stockage des données brutes (PRE-Spark)
+- **Spark Streaming**: Nettoyage et transformation en temps réel
+- **PostgreSQL**: Stockage des données nettoyées (POST-Spark)
+- **Grafana**: Comparaison RAW vs CLEANED
 
 ## 🚀 Démarrage Rapide
 
@@ -73,15 +85,17 @@ Le pipeline s'exécutera automatiquement toutes les heures.
 # 1. Récupérer les données de l'API et envoyer à Kafka
 python producer.py
 
-# 2. Consommer Kafka et insérer dans MongoDB
-python consumer.py
+# 2. Consommer Kafka et insérer dans MongoDB (RAW)
+python kafka/actors/consumer.py
 
-# 3. Nettoyer les données MongoDB
-python CleaningPolymarket.py
-
-# 4. Charger dans PostgreSQL
-python mongo_to_postgres.py
+# 3. Traiter avec Spark et insérer dans PostgreSQL (CLEANED)
+docker exec spark-master spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.7.1 \
+  /opt/spark-apps/spark_consumer.py
 ```
+
+**⚠️ Note**: Les scripts `CleaningPolymarket.py` et `mongo_to_postgres.py` sont **obsolètes** et remplacés par le Spark Consumer.
 
 ### 5. Visualiser avec Grafana
 
@@ -118,13 +132,16 @@ ArchBigDatA/
 │   └── 02-polymarket-schema.sql     # Schéma Polymarket
 │
 ├── 📁 spark-apps/                    # Applications Spark
-│   └── spark_consumer.py
+│   └── spark_consumer.py            # ⚡ Kafka → Cleaning → PostgreSQL
 │
-├── 🐍 producer.py                    # Producteur Kafka
-├── 🐍 consumer.py                    # Consommateur Kafka
-├── 🐍 CleaningPolymarket.py         # Nettoyage des données
-├── 🐍 mongo_to_postgres.py          # Transfert MongoDB → PostgreSQL
-├── 🐍 monitoring_mongo.py           # Service de monitoring
+├── 📁 kafka/actors/                  # Scripts Kafka
+│   ├── producer.py                  # Producteur Kafka
+│   └── consumer.py                  # Consommateur Kafka → MongoDB
+│
+├── 🐍 CleaningPolymarket.py         # ⚠️ OBSOLÈTE (remplacé par Spark)
+├── 🐍 mongo_to_postgres.py          # ⚠️ OBSOLÈTE (remplacé par Spark)
+├── 🐍 collect_mongo_stats.py        # Collecte stats MongoDB
+├── 🐍 monitoring.py                 # Service de monitoring
 │
 └── 📚 Documentation/
     ├── README.md
@@ -135,43 +152,55 @@ ArchBigDatA/
 ## 🔄 Flux de Données Détaillé
 
 ### Étape 1: Collecte (API → Kafka)
-- **Script**: `producer.py` ou DAG task `fetch_api_send_kafka`
+- **Script**: `kafka/actors/producer.py` ou DAG task `fetch_api_send_kafka`
 - **Source**: https://gamma-api.polymarket.com/events
 - **Destination**: Topic Kafka `polymarket-events`
-- **Fréquence**: Toutes les heures (via Airflow)
+- **Fréquence**: Toutes les heures (via Airflow) ou toutes les 5 min (via `kafka_producer_consumer` DAG)
 
-### Étape 2: Ingestion (Kafka → MongoDB Raw)
-- **Script**: `consumer.py` ou DAG task `consume_kafka_insert_mongo`
+### Étape 2A: Ingestion RAW (Kafka → MongoDB)
+- **Script**: `kafka/actors/consumer.py` ou DAG task `consume_kafka_insert_mongo`
 - **Source**: Topic Kafka `polymarket-events`
-- **Destination**: MongoDB `polymarket.polymarket`
+- **Destination**: MongoDB `Polymarket.polymarket`
 - **Type**: Données brutes, non filtrées
+- **Usage**: Comparaison dans Grafana (données RAW)
+- **Déduplication**: Index unique sur le champ `id`
 
-### Étape 3: Nettoyage (MongoDB Raw → MongoDB Cleaned)
-- **Script**: `CleaningPolymarket.py` ou DAG task `clean_polymarket_data`
-- **Source**: MongoDB `polymarket.polymarket`
-- **Destination**: MongoDB `polymarket.cleaned`
-- **Actions**:
-  - ✅ Filtrer: image, icon, seriesSlug, resolutionSource non vides
-  - ✅ Supprimer 25+ champs inutiles
-  - ✅ Conserver uniquement les données qualitatives
-
-### Étape 4: Structuration (MongoDB Cleaned → PostgreSQL)
-- **Script**: `mongo_to_postgres.py` ou DAG task `load_to_postgres`
-- **Source**: MongoDB `polymarket.cleaned`
+### Étape 2B: Traitement CLEANED (Kafka → Spark → PostgreSQL)
+- **Script**: `spark-apps/spark_consumer.py` ou DAG task `spark_processing`
+- **Source**: Topic Kafka `polymarket-events` (streaming)
 - **Destination**: PostgreSQL `polymarket.polymarket_cleaned`
+- **Traitement Spark**:
+  - ✅ **Filtrage**: image, icon, seriesSlug, resolutionSource non vides
+  - ✅ **Suppression**: 28 champs inutiles (liquidity, archived, new, etc.)
+  - ✅ **Transformation**: Renommage colonnes (id→mongo_id, conditionId→condition_id)
+  - ✅ **Conversion dates**: Timestamps vers format PostgreSQL
+  - ✅ **JSON preservation**: outcomes et outcomePrices en JSONB
+- **Mode**: Streaming temps réel (pas de batch)
 - **Avantages**:
   - 🔍 Requêtes SQL performantes
   - 📊 Jointures et agrégations avancées
-  - 🎯 Indexation optimisée
+  - 🎯 Indexation optimisée (9 index dont unique sur mongo_id)
+  - ⚡ Traitement distribué scalable
 
-### Étape 5: Visualisation (PostgreSQL → Grafana)
-- **Dashboards**: Comparaison cleaned vs raw
-- **Métriques**: Qualité, complétude, distribution
+### Étape 3: Visualisation (MongoDB + PostgreSQL → Grafana)
+- **Datasource RAW**: Table `mongodb_stats` (stats collectées depuis MongoDB)
+- **Datasource CLEANED**: Table PostgreSQL `polymarket_cleaned`
+- **Dashboards**: 
+  - Cleaned Data Analysis (métriques PostgreSQL)
+  - Comparison RAW vs CLEANED (impact du filtrage Spark)
+- **Métriques**: Count, qualité, complétude, distribution par catégorie
 - **Refresh**: 30s - 1m
 
-### Étape 6: Analyse (Spark Processing)
-- **Script**: `spark_consumer.py` ou DAG task `spark_processing`
-- **Analyses**: Machine Learning, prédictions, tendances
+### 📊 Comparaison Architecture v1 vs v2
+
+| Aspect | v1 (Ancien) | v2 (Actuel) |
+|--------|-------------|-------------|
+| **Nettoyage** | Python batch (CleaningPolymarket.py) | Spark Streaming temps réel |
+| **Transfert** | Python batch (mongo_to_postgres.py) | Spark JDBC direct |
+| **MongoDB cleaned** | Existe (intermédiaire) | ⚠️ N'existe plus |
+| **Latence** | Batch horaire | Streaming continu |
+| **Scalabilité** | Limitée | Distribuée (Spark) |
+| **Étapes** | 4 scripts séquentiels | 2 chemins parallèles |
 
 ## 🎛️ Commandes Utiles
 
@@ -218,9 +247,11 @@ SELECT * FROM polymarket_stats_by_category;
 ### MongoDB
 
 ```powershell
-# Vérifier le nombre de documents
+# Vérifier le nombre de documents RAW
 # Via Python
-python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); client = MongoClient(os.getenv('MONGO_URI')); print('Raw:', client['polymarket']['polymarket'].count_documents({})); print('Cleaned:', client['polymarket']['cleaned'].count_documents({}))"
+python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); client = MongoClient(os.getenv('MONGO_URI')); print('Raw:', client['Polymarket']['polymarket'].count_documents({}))"
+
+# Note: MongoDB 'cleaned' collection n'existe plus (remplacée par Spark → PostgreSQL direct)
 ```
 
 ### Kafka
@@ -294,14 +325,21 @@ docker exec grafana cat /etc/grafana/provisioning/datasources/datasources.yml
 ### Problème: Données non transférées vers PostgreSQL
 
 ```powershell
-# 1. Vérifier MongoDB cleaned
-python -c "from pymongo import MongoClient; import os; from dotenv import load_dotenv; load_dotenv(); print(MongoClient(os.getenv('MONGO_URI'))['polymarket']['cleaned'].count_documents({}))"
+# 1. Vérifier que Kafka reçoit les messages
+docker exec broker kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic polymarket-events --max-messages 5
 
-# 2. Exécuter manuellement le transfert
-python mongo_to_postgres.py
+# 2. Vérifier les logs Spark
+docker-compose logs spark-master
+docker-compose logs spark-worker-1
 
 # 3. Vérifier PostgreSQL
 docker exec postgres-polymarket psql -U polymarket -d polymarket -c "SELECT COUNT(*) FROM polymarket_cleaned;"
+
+# 4. Relancer le Spark Consumer manuellement
+docker exec spark-master spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.7.1 \
+  /opt/spark-apps/spark_consumer.py
 ```
 
 ### Problème: Kafka ne reçoit pas de messages
