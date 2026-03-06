@@ -6,11 +6,9 @@ import traceback
 from kafka import KafkaConsumer
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+from pymongo import ReplaceOne
 from dotenv import load_dotenv
 from monitoring import get_monitoring_service
-
-# ⚠️ Assure-toi d'avoir installé les dépendances côté Python :
-#   pip install kafka-python pymongo python-dotenv psycopg2-binary
 
 # Load environment variables
 load_dotenv()
@@ -66,6 +64,22 @@ def connect_mongodb():
         return None
 
 
+def ensure_unique_index(collection):
+    """
+    Crée un index unique sur le champ 'id' pour éviter les doublons
+    
+    Args:
+        collection: collection MongoDB
+    """
+    try:
+        # Créer un index unique sur le champ 'id'
+        collection.create_index('id', unique=True)
+        print("✅ Index unique créé sur le champ 'id'")
+    except Exception as e:
+        # L'index existe déjà ou erreur
+        print(f"ℹ️  Index 'id' : {e}")
+
+
 def create_kafka_consumer():
     """
     Crée un consommateur Kafka.
@@ -90,7 +104,9 @@ def create_kafka_consumer():
             value_deserializer=lambda m: json.loads(m.decode('utf-8')),
             # Commit automatique des offsets
             enable_auto_commit=True,
-            auto_commit_interval_ms=1000
+            auto_commit_interval_ms=1000,
+            # Timeout: arrêter après 30s sans nouveaux messages (mode batch pour DAG)
+            consumer_timeout_ms=30000  # 30 secondes d'inactivité = arrêt
         )
 
         print("✅ Consommateur Kafka créé avec succès !")
@@ -103,30 +119,51 @@ def create_kafka_consumer():
 
 def insert_batch_to_mongodb(collection, batch):
     """
-    Insère un batch de documents dans MongoDB
+    Insère ou met à jour un batch de documents dans MongoDB (évite les doublons via le champ 'id')
     
     Args:
         collection: collection MongoDB
         batch: liste de documents à insérer
+    
+    Returns:
+        Nombre de documents insérés ou mis à jour
     """
     try:
         if batch:
             start_time = time.time()
-            result = collection.insert_many(batch)
-            duration_ms = int((time.time() - start_time) * 1000)
             
-            inserted_count = len(result.inserted_ids)
-            print(f"   ✓ Inséré : {inserted_count} documents en {duration_ms}ms")
+            # Utiliser bulk_write avec ReplaceOne pour éviter les doublons
+            # Si le document existe (même 'id'), il est remplacé, sinon inséré
+            operations = [
+                ReplaceOne(
+                    filter={'id': doc['id']},
+                    replacement=doc,
+                    upsert=True
+                )
+                for doc in batch if 'id' in doc
+            ]
             
-            # Log vers PostgreSQL
-            monitoring.log_mongodb_stats(
-                collection_name=collection.name,
-                document_count=collection.count_documents({}),
-                insert_count=inserted_count,
-                insert_duration_ms=duration_ms
-            )
-            
-            return inserted_count
+            if operations:
+                result = collection.bulk_write(operations, ordered=False)
+                duration_ms = int((time.time() - start_time) * 1000)
+                
+                # Nombre d'insertions + mises à jour
+                total_count = result.upserted_count + result.modified_count
+                
+                print(f"   ✓ Traité : {total_count} documents ({result.upserted_count} nouveaux, {result.modified_count} mis à jour) en {duration_ms}ms")
+                
+                # Log vers PostgreSQL
+                monitoring.log_mongodb_stats(
+                    collection_name=collection.name,
+                    document_count=collection.count_documents({}),
+                    insert_count=result.upserted_count,
+                    insert_duration_ms=duration_ms
+                )
+                
+                return total_count
+            else:
+                print("   ⚠️  Aucun document avec un champ 'id' valide")
+                return 0
         return 0
     except Exception as e:
         print(f"   ❌ Erreur lors de l'insertion : {e}")
@@ -172,15 +209,28 @@ def consume_and_insert(consumer, collection, run_id=None):
                 # Log métriques Kafka
                 monitoring.log_kafka_metrics(
                     topic=KAFKA_TOPIC,
+                    messages_count=message_count,
                     partition=message.partition,
                     offset=message.offset,
-                    messages_count=message_count,
                     consumer_group=KAFKA_GROUP_ID
                 )
                 
                 batch = []
                 message_count = 0
                 print(f"   📊 Total inséré jusqu'à maintenant : {total_inserted} documents\n")
+    
+    except StopIteration:
+        # Timeout atteint (30s sans nouveaux messages) - comportement normal
+        print("\n⏱️  Timeout atteint : plus de messages disponibles")
+        
+        # Insérer le dernier batch s'il n'est pas vide
+        if batch:
+            print(f"\n💾 Insertion du dernier batch ({len(batch)} documents)...")
+            inserted = insert_batch_to_mongodb(collection, batch)
+            total_inserted += inserted
+        
+        print(f"\n✅ Total de documents traités : {total_inserted}")
+        print("🛑 Arrêt du consommateur...")
     
     except KeyboardInterrupt:
         print("\n\n⚠️  Interruption par l'utilisateur...")
@@ -234,6 +284,9 @@ def main():
     # Récupération de la collection
     db = client[MONGO_DB_NAME]
     collection = db[MONGO_COLLECTION_NAME]
+    
+    # Créer un index unique sur le champ 'id' pour éviter les doublons
+    ensure_unique_index(collection)
     
     print(f"\n📊 Database: {MONGO_DB_NAME}")
     print(f"📊 Collection: {MONGO_COLLECTION_NAME}")

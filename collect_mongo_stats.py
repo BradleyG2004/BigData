@@ -1,12 +1,20 @@
 """
 Script pour collecter les statistiques MongoDB et les stocker dans PostgreSQL.
-Ce script alimente la table mongodb_stats utilisée par Grafana pour la comparaison.
+Ce script alimente la table mongodb_stats utilisée par Grafana pour la comparaison RAW vs CLEANED.
+
+Collections surveillées:
+    - polymarket (RAW data) → Stockée dans mongodb_stats pour affichage Grafana
+
+Architecture:
+    MongoDB (Polymarket.polymarket) → collect_mongo_stats.py → PostgreSQL (mongodb_stats) → Grafana
 
 Exécution: 
     python collect_mongo_stats.py
+    python collect_mongo_stats.py --continuous --interval 300
 
 Configuration via .env:
     MONGO_URI=mongodb+srv://...
+    MONGO_DB=Polymarket (capitale P)
     POSTGRES_HOST=localhost
     POSTGRES_PORT=5433
     POSTGRES_DB=polymarket
@@ -30,7 +38,7 @@ load_dotenv()
 
 # Configuration MongoDB
 MONGO_URI = os.getenv('MONGO_URI')
-MONGO_DB = os.getenv('MONGO_DB', 'polymarket')
+MONGO_DB = os.getenv('MONGO_DB', 'Polymarket')  # Capitale P pour MongoDB Atlas
 
 # Configuration PostgreSQL
 POSTGRES_CONFIG = {
@@ -166,7 +174,8 @@ def collect_and_store_stats(continuous: bool = False, interval: int = 300):
         return
     
     # Collections à surveiller
-    collections_to_monitor = ['polymarket', 'cleaned']
+    # Note: 'cleaned' n'existe plus (remplacée par Spark → PostgreSQL direct)
+    collections_to_monitor = ['polymarket']  # RAW data uniquement
     
     try:
         iteration = 0

@@ -2,8 +2,12 @@ apiVersion: 1
 
 datasources:
   # ================================
-  # PostgreSQL - Données nettoyées
+  # PostgreSQL - Données CLEANED (POST-Spark)
   # ================================
+  # Source: Données nettoyées et transformées par Spark Consumer
+  # Pipeline: Kafka → Spark (filtrage + nettoyage) → PostgreSQL
+  # Table: polymarket_cleaned
+  # Utilisation: Dashboard de comparaison (données cleaned)
   - name: PostgreSQL - Polymarket Cleaned
     type: postgres
     access: proxy
@@ -21,15 +25,20 @@ datasources:
     uid: postgres-cleaned
 
   # ================================
-  # MongoDB - Données brutes et nettoyées
+  # MongoDB - Données RAW (PRE-Spark)
   # ================================
-  # Note: MongoDB datasource doit être configurée manuellement via l'UI Grafana
+  # Source: Données brutes insérées par consumer.py depuis Kafka
+  # Pipeline: Kafka → Consumer Python → MongoDB
+  # Collection: Polymarket.polymarket
+  # Utilisation: Dashboard de comparaison (données raw)
+  #
+  # ⚠️ Note: MongoDB datasource doit être configurée manuellement via l'UI Grafana
   # Car les variables d'environnement ne sont pas interpolées dans les fichiers de provisioning
   #
   # Pour ajouter MongoDB manuellement:
   # 1. Aller dans Configuration → Data Sources → Add data source
   # 2. Chercher "MongoDB" et installer le plugin si nécessaire
   # 3. Configurer avec votre MONGO_URI depuis .env
-  # 4. Database: polymarket
-  # 5. Collections: polymarket (raw), cleaned
+  # 4. Database: Polymarket (avec P majuscule)
+  # 5. Collection à monitorer: polymarket (données brutes avant Spark)
 
